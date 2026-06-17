@@ -1,0 +1,90 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  phone        String?
+  passwordHash String
+  role         String        @default("master")
+  masterProfile MasterProfile?
+  appointments  Appointment[] @relation("MasterAppointments")
+  workingHours  WorkingHour[]
+  createdAt    DateTime      @default(now())
+}
+
+model Service {
+  id              Int             @id @default(autoincrement())
+  name            String
+  description     String?
+  category        String
+  durationMinutes Int
+  price           Float
+  isActive        Boolean         @default(true)
+  masterServices  MasterService[]
+  appointments    Appointment[]
+  promotions      Promotion[]
+}
+
+model MasterProfile {
+  id             Int             @id @default(autoincrement())
+  userId         Int             @unique
+  bio            String?
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  masterServices MasterService[]
+}
+
+model MasterService {
+  masterId    Int
+  serviceId   Int
+  customPrice Float?
+  master      MasterProfile @relation(fields: [masterId], references: [id], onDelete: Cascade)
+  service     Service       @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([masterId, serviceId])
+}
+
+model Promotion {
+  id              Int      @id @default(autoincrement())
+  name            String
+  serviceId       Int?
+  discountPercent Int
+  startDate       DateTime
+  endDate         DateTime
+  isActive        Boolean  @default(true)
+  service         Service? @relation(fields: [serviceId], references: [id])
+}
+
+model WorkingHour {
+  id        Int     @id @default(autoincrement())
+  masterId  Int
+  dayOfWeek Int
+  startTime String
+  endTime   String
+  isActive  Boolean @default(true)
+  master    User    @relation(fields: [masterId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  clientName  String
+  clientPhone String
+  clientEmail String
+  masterId    Int
+  serviceId   Int
+  startAt     DateTime
+  endAt       DateTime
+  status      String   @default("pending")
+  notes       String?
+  totalPrice  Float
+  createdAt   DateTime @default(now())
+  master      User     @relation("MasterAppointments", fields: [masterId], references: [id])
+  service     Service  @relation(fields: [serviceId], references: [id])
+}
