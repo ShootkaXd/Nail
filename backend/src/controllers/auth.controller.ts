@@ -4,12 +4,12 @@ import jwt from 'jsonwebtoken'
 import prisma from '../lib/prisma'
 
 export async function login(req: Request, res: Response) {
-  const { email, password } = req.body
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password required' })
+  const { login: username, password } = req.body
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Login and password required' })
   }
 
-  const user = await prisma.user.findUnique({ where: { email } })
+  const user = await prisma.user.findUnique({ where: { login: username } })
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     return res.status(401).json({ error: 'Invalid credentials' })
   }

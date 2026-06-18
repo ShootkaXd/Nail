@@ -12,7 +12,9 @@ export async function getAvailableSlots(
   serviceId: number,
   dateStr: string
 ): Promise<string[]> {
-  const date = new Date(dateStr)
+  // Parse as local midnight to avoid timezone shift on dayOfWeek
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const date = new Date(year, month - 1, day)
   const dayOfWeek = date.getDay()
 
   const workingHour = await prisma.workingHour.findFirst({
@@ -29,10 +31,8 @@ export async function getAvailableSlots(
   const workStart = parseTime(workingHour.startTime, date)
   const workEnd = parseTime(workingHour.endTime, date)
 
-  const dayStart = new Date(date)
-  dayStart.setHours(0, 0, 0, 0)
-  const dayEnd = new Date(date)
-  dayEnd.setHours(23, 59, 59, 999)
+  const dayStart = new Date(year, month - 1, day, 0, 0, 0, 0)
+  const dayEnd = new Date(year, month - 1, day, 23, 59, 59, 999)
 
   const existingAppointments = await prisma.appointment.findMany({
     where: {

@@ -8,11 +8,11 @@ async function main() {
   const masterHash = await bcrypt.hash('master123', 10)
 
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@nail.local' },
+    where: { login: 'admin' },
     update: {},
-    create: { name: 'Администратор', email: 'admin@nail.local', passwordHash: adminHash, role: 'admin' },
+    create: { name: 'Администратор', login: 'admin', email: 'admin@nail.local', passwordHash: adminHash, role: 'admin' },
   })
-  console.log('Admin created:', admin.email)
+  console.log('Admin created:', admin.login)
 
   const services = await Promise.all([
     prisma.service.upsert({ where: { id: 1 }, update: {}, create: { name: 'Классический маникюр', description: 'Обработка ногтей, покрытие лаком', category: 'Маникюр', durationMinutes: 60, price: 1200 } }),
@@ -25,11 +25,12 @@ async function main() {
 
   const [s1, s2, s3, s4, s5] = services
 
-  let master1 = await prisma.user.findUnique({ where: { email: 'anna@nail.local' } })
+  let master1 = await prisma.user.findUnique({ where: { login: 'anna' } })
   if (!master1) {
     master1 = await prisma.user.create({
       data: {
         name: 'Анна Смирнова',
+        login: 'anna',
         email: 'anna@nail.local',
         phone: '+7 900 111 2233',
         passwordHash: masterHash,
@@ -46,11 +47,12 @@ async function main() {
     })
   }
 
-  let master2 = await prisma.user.findUnique({ where: { email: 'maria@nail.local' } })
+  let master2 = await prisma.user.findUnique({ where: { login: 'maria' } })
   if (!master2) {
     master2 = await prisma.user.create({
       data: {
         name: 'Мария Козлова',
+        login: 'maria',
         email: 'maria@nail.local',
         phone: '+7 900 444 5566',
         passwordHash: masterHash,
@@ -66,16 +68,15 @@ async function main() {
       },
     })
   }
-  console.log('Masters created:', master1.email, master2.email)
+  console.log('Masters created:', master1.login, master2.login)
 
-  const days = [1, 2, 3, 4, 5] // Mon-Fri
+  const days = [1, 2, 3, 4, 5]
   for (const masterId of [master1.id, master2.id]) {
     await prisma.workingHour.deleteMany({ where: { masterId } })
     await prisma.workingHour.createMany({
       data: days.map((d) => ({ masterId, dayOfWeek: d, startTime: '09:00', endTime: '18:00', isActive: true })),
     })
   }
-  // Add Saturday for master1
   await prisma.workingHour.create({
     data: { masterId: master1.id, dayOfWeek: 6, startTime: '10:00', endTime: '16:00', isActive: true },
   })

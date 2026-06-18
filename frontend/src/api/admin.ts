@@ -10,9 +10,9 @@ export const servicesApi = {
 
 export const mastersApi = {
   list: () => api.get<Master[]>('/masters').then(r => r.data),
-  create: (data: { name: string; email: string; phone?: string; password?: string; bio?: string; serviceIds?: number[] }) =>
+  create: (data: { name: string; login: string; email?: string; phone?: string; password?: string; bio?: string; serviceIds?: number[] }) =>
     api.post<Master>('/masters', data).then(r => r.data),
-  update: (id: number, data: Partial<{ name: string; email: string; phone: string; bio: string; serviceIds: number[]; password: string }>) =>
+  update: (id: number, data: Partial<{ name: string; login: string; email: string; phone: string; bio: string; serviceIds: number[]; password: string }>) =>
     api.put<Master>(`/masters/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/masters/${id}`),
   getWorkingHours: (id: number) => api.get<WorkingHour[]>(`/masters/${id}/working-hours`).then(r => r.data),
@@ -43,7 +43,7 @@ export const masterApi = {
 }
 
 export const authApi = {
-  login: (email: string, password: string) =>
-    api.post<{ token: string; user: { id: number; name: string; email: string; role: string } }>('/auth/login', { email, password }).then(r => r.data),
+  login: (login: string, password: string) =>
+    api.post<{ token: string; user: { id: number; name: string; email: string; role: string } }>('/auth/login', { login, password }).then(r => r.data),
   me: () => api.get('/auth/me').then(r => r.data),
 }

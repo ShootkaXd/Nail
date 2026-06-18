@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import StepIndicator from '../components/booking/StepIndicator'
 import Step1Service from '../components/booking/Step1_Service'
 import Step2Master from '../components/booking/Step2_Master'
@@ -29,12 +30,20 @@ export default function BookingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50">
       <header className="bg-white shadow-sm border-b border-rose-100">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">💅</div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Nail Studio</h1>
-            <p className="text-xs text-gray-500">Онлайн запись на услуги</p>
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">💅</div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Nail Studio</h1>
+              <p className="text-xs text-gray-500">Онлайн запись на услуги</p>
+            </div>
           </div>
+          <Link
+            to="/login"
+            className="text-sm text-gray-400 hover:text-gray-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100"
+          >
+            Вход для сотрудников
+          </Link>
         </div>
       </header>
 

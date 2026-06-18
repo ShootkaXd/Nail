@@ -65,7 +65,7 @@ function WorkingHoursEditor({ masterId, onClose }: { masterId: number; onClose: 
   )
 }
 
-type MasterForm = { name: string; email: string; phone: string; bio: string; password: string }
+type MasterForm = { name: string; login: string; email: string; phone: string; bio: string; password: string }
 
 function MasterFormComponent({ master, services, onSave, onCancel }: { master?: Master; services: Service[]; onSave: () => void; onCancel: () => void }) {
   const [selectedServices, setSelectedServices] = useState<number[]>(
@@ -73,10 +73,10 @@ function MasterFormComponent({ master, services, onSave, onCancel }: { master?: 
   )
   const [loading, setLoading] = useState(false)
   const { register, handleSubmit, formState: { errors } } = useForm<MasterForm>({
-    defaultValues: { name: master?.name ?? '', email: '', phone: master?.phone ?? '', bio: master?.masterProfile?.bio ?? '', password: '' },
+    defaultValues: { name: master?.name ?? '', login: master?.login ?? '', email: '', phone: master?.phone ?? '', bio: master?.masterProfile?.bio ?? '', password: '' },
   })
 
-  const submit = async (data: MasterForm) => {
+  const submit = async (data: MasterForm): Promise<void> => {
     setLoading(true)
     try {
       const payload = { ...data, serviceIds: selectedServices }
@@ -92,7 +92,8 @@ function MasterFormComponent({ master, services, onSave, onCancel }: { master?: 
   return (
     <form onSubmit={handleSubmit(submit)} className="space-y-4">
       <Input label="Имя *" {...register('name', { required: true })} error={errors.name ? 'Обязательное поле' : ''} />
-      {!master && <Input label="Email *" type="email" {...register('email', { required: true })} error={errors.email ? 'Обязательное поле' : ''} />}
+      {!master && <Input label="Логин *" {...register('login', { required: true })} placeholder="anna_master" error={errors.login ? 'Обязательное поле' : ''} />}
+      {!master && <Input label="Email" type="email" {...register('email')} placeholder="anna@mail.ru" />}
       <Input label="Телефон" {...register('phone')} />
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-gray-700">О мастере</label>

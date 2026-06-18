@@ -17,6 +17,7 @@ export interface MasterProfile {
 export interface Master {
   id: number
   name: string
+  login?: string
   phone: string | null
   masterProfile: MasterProfile | null
 }

@@ -6,7 +6,7 @@ export async function listMasters(req: Request, res: Response) {
   const masters = await prisma.user.findMany({
     where: { role: 'master' },
     select: {
-      id: true, name: true, email: true, phone: true,
+      id: true, name: true, login: true, email: true, phone: true,
       masterProfile: {
         select: {
           id: true, bio: true,
@@ -20,12 +20,12 @@ export async function listMasters(req: Request, res: Response) {
 }
 
 export async function createMaster(req: Request, res: Response) {
-  const { name, email, phone, password, bio, serviceIds } = req.body
+  const { name, login, email, phone, password, bio, serviceIds } = req.body
   const passwordHash = await bcrypt.hash(password || 'master123', 10)
 
   const user = await prisma.user.create({
     data: {
-      name, email, phone, passwordHash, role: 'master',
+      name, login, email, phone, passwordHash, role: 'master',
       masterProfile: {
         create: {
           bio: bio || null,
@@ -46,6 +46,7 @@ export async function updateMaster(req: Request, res: Response) {
 
   const updateData: Record<string, unknown> = {}
   if (name) updateData.name = name
+  if (login) updateData.login = login
   if (email) updateData.email = email
   if (phone !== undefined) updateData.phone = phone
   if (password) updateData.passwordHash = await bcrypt.hash(password, 10)
