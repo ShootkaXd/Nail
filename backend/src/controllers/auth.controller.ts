@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import prisma from '../lib/prisma'
+import { env } from '../config/env'
 
 export async function login(req: Request, res: Response) {
   const { login: username, password } = req.body
@@ -16,8 +17,8 @@ export async function login(req: Request, res: Response) {
 
   const token = jwt.sign(
     { id: user.id, role: user.role, name: user.name },
-    process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN as string }
+    env.JWT_SECRET,
+    { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
   )
 
   res.json({ token, user: { id: user.id, name: user.name, role: user.role, email: user.email } })

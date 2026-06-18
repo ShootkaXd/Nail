@@ -42,7 +42,7 @@ export async function createMaster(req: Request, res: Response) {
 
 export async function updateMaster(req: Request, res: Response) {
   const id = Number(req.params.id)
-  const { name, email, phone, bio, serviceIds, password } = req.body
+  const { name, login, email, phone, bio, serviceIds, password } = req.body
 
   const updateData: Record<string, unknown> = {}
   if (name) updateData.name = name
