@@ -8,7 +8,7 @@
 
 ```bash
 # 1. Клонируйте репозиторий
-git clone [<repo-url>](https://github.com/ShootkaXd/Nail.git) nail && cd nail
+git clone https://github.com/ShootkaXd/Nail.git nail && cd nail
 
 # 2. Создайте .env с секретами
 cp .env.example .env
