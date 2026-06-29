@@ -4,16 +4,38 @@ import helmet from 'helmet'
 import morgan from 'morgan'
 import router from './routes'
 import { errorHandler } from './middleware/errorHandler'
+import { apiLimiter } from './middleware/rateLimit'
 import { env } from './config/env'
 
 const app = express()
 
-app.use(helmet())
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }))
-app.use(morgan('dev'))
-app.use(express.json())
+// Behind a reverse proxy (nginx/docker) — needed for correct client IPs in rate limiting
+app.set('trust proxy', 1)
+app.disable('x-powered-by')
 
-app.use('/api', router)
+// Security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: false, // SPA served separately; configure at proxy if needed
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+  })
+)
+
+// Lock CORS to configured origins (comma-separated supported)
+const allowedOrigins = env.CORS_ORIGIN.split(',').map((s) => s.trim())
+app.use(
+  cors({
+    origin: allowedOrigins.includes('*') ? true : allowedOrigins,
+    credentials: true,
+  })
+)
+
+app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'))
+app.use(express.json({ limit: '100kb' }))
+
+app.get('/api/health', (_req, res) => res.json({ status: 'ok' }))
+
+app.use('/api', apiLimiter, router)
 
 app.use(errorHandler)
 

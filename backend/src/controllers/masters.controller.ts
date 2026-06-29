@@ -21,7 +21,7 @@ export async function listMasters(req: Request, res: Response) {
 
 export async function createMaster(req: Request, res: Response) {
   const { name, login, email, phone, password, bio, serviceIds } = req.body
-  const passwordHash = await bcrypt.hash(password || 'master123', 10)
+  const passwordHash = await bcrypt.hash(password || "master123", 12)
 
   const user = await prisma.user.create({
     data: {
@@ -49,7 +49,7 @@ export async function updateMaster(req: Request, res: Response) {
   if (login) updateData.login = login
   if (email) updateData.email = email
   if (phone !== undefined) updateData.phone = phone
-  if (password) updateData.passwordHash = await bcrypt.hash(password, 10)
+  if (password) updateData.passwordHash = await bcrypt.hash(password, 12)
 
   const user = await prisma.user.update({
     where: { id },

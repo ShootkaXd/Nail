@@ -66,6 +66,23 @@ export interface PriceInfo {
   promotionName: string | null
 }
 
+export interface FormFieldConfig {
+  enabled: boolean
+  required: boolean
+  label: string
+}
+
+export interface BookingFormConfig {
+  title: string
+  subtitle: string
+  fields: {
+    name: FormFieldConfig
+    phone: FormFieldConfig
+    email: FormFieldConfig
+    notes: FormFieldConfig
+  }
+}
+
 export interface AuthUser {
   id: number
   name: string

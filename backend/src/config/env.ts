@@ -15,4 +15,5 @@ export const env = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '24h',
   PORT: Number(process.env.PORT) || 3000,
   CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
+  NODE_ENV: process.env.NODE_ENV || 'development',
 }

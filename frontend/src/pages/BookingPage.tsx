@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import StepIndicator from '../components/booking/StepIndicator'
 import Step1Service from '../components/booking/Step1_Service'
@@ -6,7 +6,8 @@ import Step2Master from '../components/booking/Step2_Master'
 import Step3DateTime from '../components/booking/Step3_DateTime'
 import Step4Contact from '../components/booking/Step4_Contact'
 import Step5Confirm from '../components/booking/Step5_Confirm'
-import type { Service, Master, PriceInfo } from '../types'
+import { publicApi } from '../api/public'
+import type { Service, Master, PriceInfo, BookingFormConfig } from '../types'
 
 export interface BookingState {
   service: Service | null
@@ -25,6 +26,10 @@ export default function BookingPage() {
     contact: null, priceInfo: null, appointmentId: null,
   })
 
+  const [formConfig, setFormConfig] = useState<BookingFormConfig | null>(null)
+
+  useEffect(() => { publicApi.getFormConfig().then(setFormConfig).catch(() => {}) }, [])
+
   const update = (patch: Partial<BookingState>) => setBooking(b => ({ ...b, ...patch }))
 
   return (
@@ -34,8 +39,8 @@ export default function BookingPage() {
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">💅</div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">Nail Studio</h1>
-              <p className="text-xs text-gray-500">Онлайн запись на услуги</p>
+              <h1 className="text-xl font-bold text-gray-900">{formConfig?.title ?? 'Nail Studio'}</h1>
+              <p className="text-xs text-gray-500">{formConfig?.subtitle ?? 'Онлайн запись на услуги'}</p>
             </div>
           </div>
           <Link
@@ -77,6 +82,7 @@ export default function BookingPage() {
         {step === 4 && (
           <Step4Contact
             contact={booking.contact}
+            formConfig={formConfig}
             onSubmit={(contact) => { update({ contact }); setStep(5) }}
             onBack={() => setStep(3)}
           />

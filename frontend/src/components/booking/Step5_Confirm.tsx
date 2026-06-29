@@ -27,7 +27,7 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
       const result = await publicApi.createAppointment({
         clientName: contact.name,
         clientPhone: contact.phone,
-        clientEmail: contact.email,
+        clientEmail: contact.email || undefined,
         masterId: master.id,
         serviceId: service.id,
         startAt: slot,

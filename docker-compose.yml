@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: "file:/app/data/prod.db"
+      JWT_SECRET: "${JWT_SECRET:?Set JWT_SECRET in .env}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-24h}"
+      PORT: "3000"
+      CORS_ORIGIN: "${CORS_ORIGIN:-*}"
+      NODE_ENV: "production"
+    volumes:
+      - db-data:/app/data
+    expose:
+      - "3000"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+
+volumes:
+  db-data:

@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import prisma from '../lib/prisma'
 import { getAvailableSlots } from '../services/slot.service'
 import { calculatePrice } from '../services/price.service'
+import { getBookingForm } from './settings.controller'
 
 export async function getServices(req: Request, res: Response) {
   const services = await prisma.service.findMany({
@@ -65,8 +66,13 @@ export async function getPrice(req: Request, res: Response) {
 export async function createAppointment(req: Request, res: Response) {
   const { clientName, clientPhone, clientEmail, masterId, serviceId, startAt, notes } = req.body
 
-  if (!clientName || !clientPhone || !clientEmail || !masterId || !serviceId || !startAt) {
-    return res.status(400).json({ error: 'Missing required fields' })
+  // Enforce per-config required fields (body already validated by zod)
+  const form = await getBookingForm()
+  if (form.fields.email.enabled && form.fields.email.required && !clientEmail) {
+    return res.status(400).json({ error: 'Email обязателен' })
+  }
+  if (form.fields.notes.enabled && form.fields.notes.required && !notes) {
+    return res.status(400).json({ error: 'Поле «Пожелания» обязательно' })
   }
 
   const service = await prisma.service.findUnique({ where: { id: Number(serviceId) } })
@@ -91,7 +97,7 @@ export async function createAppointment(req: Request, res: Response) {
     data: {
       clientName,
       clientPhone,
-      clientEmail,
+      clientEmail: clientEmail || null,
       masterId: Number(masterId),
       serviceId: Number(serviceId),
       startAt: start,

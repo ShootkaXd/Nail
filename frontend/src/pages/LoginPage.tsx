@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authApi } from '../api/admin'
 import { useAuthStore } from '../store/auth.store'
@@ -13,6 +13,10 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const { login: doLogin } = useAuthStore()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    authApi.setupStatus().then(({ needsSetup }) => { if (needsSetup) navigate('/setup', { replace: true }) }).catch(() => {})
+  }, [navigate])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

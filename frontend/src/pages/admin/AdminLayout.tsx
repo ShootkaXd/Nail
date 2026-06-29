@@ -6,6 +6,8 @@ const nav = [
   { to: '/admin/masters', label: 'Мастера', icon: '👩‍🎨' },
   { to: '/admin/promotions', label: 'Акции', icon: '🎉' },
   { to: '/admin/bookings', label: 'Записи', icon: '📋' },
+  { to: '/admin/admins', label: 'Администраторы', icon: '🛡️' },
+  { to: '/admin/settings', label: 'Настройки', icon: '⚙️' },
 ]
 
 export default function AdminLayout() {

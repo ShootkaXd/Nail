@@ -2,11 +2,14 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/auth.store'
 import BookingPage from './pages/BookingPage'
 import LoginPage from './pages/LoginPage'
+import SetupPage from './pages/SetupPage'
 import AdminLayout from './pages/admin/AdminLayout'
 import ServicesPage from './pages/admin/ServicesPage'
 import MastersPage from './pages/admin/MastersPage'
 import PromotionsPage from './pages/admin/PromotionsPage'
 import BookingsPage from './pages/admin/BookingsPage'
+import AdminsPage from './pages/admin/AdminsPage'
+import SettingsPage from './pages/admin/SettingsPage'
 import MasterLayout from './pages/master/MasterLayout'
 import CalendarPage from './pages/master/CalendarPage'
 import WorkingHoursPage from './pages/master/WorkingHoursPage'
@@ -23,6 +26,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<BookingPage />} />
+        <Route path="/setup" element={<SetupPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/admin" element={<RequireRole role="admin"><AdminLayout /></RequireRole>}>
@@ -31,6 +35,8 @@ export default function App() {
           <Route path="masters" element={<MastersPage />} />
           <Route path="promotions" element={<PromotionsPage />} />
           <Route path="bookings" element={<BookingsPage />} />
+          <Route path="admins" element={<AdminsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
 
         <Route path="/master" element={<RequireRole role="master"><MasterLayout /></RequireRole>}>

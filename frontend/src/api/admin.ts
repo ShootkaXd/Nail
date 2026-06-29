@@ -42,7 +42,31 @@ export const masterApi = {
     api.put<WorkingHour[]>('/working-hours', hours).then(r => r.data),
 }
 
+export const adminsApi = {
+  list: () => api.get<Array<{ id: number; name: string; login: string; email: string | null; createdAt: string }>>('/admins').then(r => r.data),
+  create: (data: { name: string; login: string; email?: string; password: string }) =>
+    api.post('/admins', data).then(r => r.data),
+  delete: (id: number) => api.delete(`/admins/${id}`),
+}
+
+export const settingsApi = {
+  updateBookingForm: (config: unknown) => api.put('/settings/booking-form', config).then(r => r.data),
+}
+
+export const systemApi = {
+  version: () => api.get<{ version: string; commit: string; branch: string }>('/system/version').then(r => r.data),
+  checkUpdates: () => api.get<{ updateAvailable: boolean; local: string; remote: string; changes: string }>('/system/check-updates').then(r => r.data),
+}
+
+export const accountApi = {
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post('/auth/change-password', { currentPassword, newPassword }).then(r => r.data),
+}
+
 export const authApi = {
+  setupStatus: () => api.get<{ needsSetup: boolean }>('/setup/status').then(r => r.data),
+  setup: (data: { name: string; login: string; email?: string; password: string }) =>
+    api.post<{ token: string; user: { id: number; name: string; email: string; role: string } }>('/setup', data).then(r => r.data),
   login: (login: string, password: string) =>
     api.post<{ token: string; user: { id: number; name: string; email: string; role: string } }>('/auth/login', { login, password }).then(r => r.data),
   me: () => api.get('/auth/me').then(r => r.data),
