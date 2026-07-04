@@ -66,6 +66,24 @@ export interface PriceInfo {
   promotionName: string | null
 }
 
+export interface MasterPhoto {
+  id: number
+  url: string
+  caption: string | null
+  createdAt?: string
+}
+
+export interface GalleryMaster {
+  id: number
+  name: string
+  masterProfile: {
+    id: number
+    bio: string | null
+    photos: MasterPhoto[]
+    masterServices: Array<{ service: { id: number; name: string; category: string } }>
+  } | null
+}
+
 export interface FormFieldConfig {
   enabled: boolean
   required: boolean

@@ -9,6 +9,7 @@ services:
       PORT: "3000"
       CORS_ORIGIN: "${CORS_ORIGIN:-*}"
       NODE_ENV: "production"
+      UPLOAD_DIR: "/app/data/uploads"
     volumes:
       - db-data:/app/data
     expose:

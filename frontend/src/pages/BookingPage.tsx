@@ -7,6 +7,7 @@ import Step3DateTime from '../components/booking/Step3_DateTime'
 import Step4Contact from '../components/booking/Step4_Contact'
 import Step5Confirm from '../components/booking/Step5_Confirm'
 import { publicApi } from '../api/public'
+import { useSeason } from '../hooks/useSeason'
 import type { Service, Master, PriceInfo, BookingFormConfig } from '../types'
 
 export interface BookingState {
@@ -32,10 +33,12 @@ export default function BookingPage() {
 
   const update = (patch: Partial<BookingState>) => setBooking(b => ({ ...b, ...patch }))
 
+  const theme = useSeason()
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50">
-      <header className="bg-white shadow-sm border-b border-rose-100">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.gradient}`}>
+      <header className={`bg-white/80 backdrop-blur shadow-sm border-b ${theme.headerBorder}`}>
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">💅</div>
             <div>
@@ -43,12 +46,17 @@ export default function BookingPage() {
               <p className="text-xs text-gray-500">{formConfig?.subtitle ?? 'Онлайн запись на услуги'}</p>
             </div>
           </div>
-          <Link
-            to="/login"
-            className="text-sm text-gray-400 hover:text-gray-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100"
-          >
-            Вход для сотрудников
-          </Link>
+          <div className="flex items-center gap-2">
+            <span className={`hidden sm:inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full ${theme.badge}`}>
+              {theme.emoji} {theme.label}
+            </span>
+            <Link to="/masters" className="text-sm text-gray-500 hover:text-gray-700 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
+              Наши мастера
+            </Link>
+            <Link to="/login" className="text-sm text-gray-400 hover:text-gray-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
+              Вход
+            </Link>
+          </div>
         </div>
       </header>
 

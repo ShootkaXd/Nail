@@ -6,9 +6,11 @@ import { validateBody, loginSchema, setupSchema, createAppointmentSchema } from 
 import { listServices, createService, updateService, deleteService } from '../controllers/services.controller'
 import { listMasters, createMaster, updateMaster, deleteMaster } from '../controllers/masters.controller'
 import { listPromotions, createPromotion, updatePromotion, deletePromotion } from '../controllers/promotions.controller'
-import { listAll, listMine, updateStatus } from '../controllers/appointments.controller'
 import { getMyHours, saveMyHours, getMasterHours, saveMasterHours } from '../controllers/workingHours.controller'
-import { getServices, getMasters, getSlots, getPrice, createAppointment } from '../controllers/public.controller'
+import { getServices, getMasters, getMastersGallery, getSlots, getPrice, createAppointment } from '../controllers/public.controller'
+import { listAll, listMine, updateStatus, myServices, createByStaff } from '../controllers/appointments.controller'
+import { earnings } from '../controllers/reports.controller'
+import { uploadMiddleware, uploadPhoto, listMyPhotos, deletePhoto } from '../controllers/photos.controller'
 import { setupStatus, setup } from '../controllers/setup.controller'
 import { listAdmins, createAdmin, deleteAdmin, changePassword } from '../controllers/admins.controller'
 import { getBookingFormPublic, updateBookingForm } from '../controllers/settings.controller'
@@ -26,6 +28,7 @@ router.get('/public/masters', getMasters)
 router.get('/public/slots', getSlots)
 router.get('/public/price', getPrice)
 router.get('/public/form-config', getBookingFormPublic)
+router.get('/public/masters-gallery', getMastersGallery)
 router.post('/public/appointments', bookingLimiter, validateBody(createAppointmentSchema), createAppointment)
 
 // Auth
@@ -62,6 +65,18 @@ router.put('/settings/booking-form', authenticate, requireRole('admin'), updateB
 // Admin — system / updates
 router.get('/system/version', authenticate, requireRole('admin'), versionInfo)
 router.get('/system/check-updates', authenticate, requireRole('admin'), checkUpdates)
+
+// Admin — accounting / earnings report
+router.get('/reports/earnings', authenticate, requireRole('admin'), earnings)
+
+// Staff booking (master books own client, admin any)
+router.post('/appointments', authenticate, requireRole('master', 'admin'), createByStaff)
+router.get('/master/my-services', authenticate, requireRole('master'), myServices)
+
+// Master portfolio photos
+router.get('/master/photos', authenticate, requireRole('master', 'admin'), listMyPhotos)
+router.post('/master/photos', authenticate, requireRole('master', 'admin'), uploadMiddleware, uploadPhoto)
+router.delete('/master/photos/:id', authenticate, requireRole('master', 'admin'), deletePhoto)
 
 // Admin — all appointments
 router.get('/appointments', authenticate, requireRole('admin'), listAll)

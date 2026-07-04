@@ -7,6 +7,8 @@ import { masterApi, appointmentsApi } from '../../api/admin'
 import type { Appointment } from '../../types'
 import Modal from '../../components/ui/Modal'
 import Badge from '../../components/ui/Badge'
+import Button from '../../components/ui/Button'
+import MasterBookingForm from '../../components/master/MasterBookingForm'
 
 const STATUS_COLORS: Record<string, string> = {
   pending: '#f59e0b',
@@ -21,6 +23,7 @@ const STATUS_LABELS: Record<string, string> = { pending: 'Ожидает', confi
 export default function CalendarPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [selected, setSelected] = useState<Appointment | null>(null)
+  const [booking, setBooking] = useState(false)
   const calendarRef = useRef<FullCalendar>(null)
 
   const load = () => masterApi.listMine().then(setAppointments)
@@ -44,9 +47,10 @@ export default function CalendarPage() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Мой календарь</h1>
-        <div className="flex items-center gap-4 text-xs">
+        <Button onClick={() => setBooking(true)}>+ Записать клиента</Button>
+        <div className="flex items-center gap-4 text-xs w-full sm:w-auto">
           {Object.entries(STATUS_LABELS).map(([k, v]) => (
             <div key={k} className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-full" style={{ background: STATUS_COLORS[k] }} />
@@ -104,6 +108,10 @@ export default function CalendarPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal open={booking} onClose={() => setBooking(false)} title="Записать клиента" size="sm">
+        <MasterBookingForm onDone={() => { setBooking(false); load() }} onCancel={() => setBooking(false)} />
       </Modal>
     </div>
   )

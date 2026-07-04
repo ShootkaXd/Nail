@@ -15,6 +15,7 @@ export default function SettingsPage() {
   const [version, setVersion] = useState<{ version: string; commit: string; branch: string } | null>(null)
   const [updateInfo, setUpdateInfo] = useState<{ updateAvailable: boolean; local: string; remote: string; changes: string } | null>(null)
   const [checkingUpdate, setCheckingUpdate] = useState(false)
+  const [season, setSeason] = useState(() => localStorage.getItem('season') || 'auto')
 
   useEffect(() => {
     publicApi.getFormConfig().then(setConfig)
@@ -89,6 +90,27 @@ export default function SettingsPage() {
             {saved && <span className="text-sm text-green-600">✓ Сохранено</span>}
           </div>
         </div>
+      </section>
+
+      {/* Seasonal theme */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 mb-1">Оформление по временам года</h2>
+        <p className="text-sm text-gray-500 mb-4">Тема оформления страницы записи. «Авто» — определяется по текущей дате.</p>
+        <div className="flex flex-wrap gap-2">
+          {[
+            { key: 'auto', label: '🔄 Авто' },
+            { key: 'winter', label: '❄️ Зима' },
+            { key: 'spring', label: '🌸 Весна' },
+            { key: 'summer', label: '☀️ Лето' },
+            { key: 'autumn', label: '🍂 Осень' },
+          ].map(opt => (
+            <button key={opt.key} onClick={() => { localStorage.setItem('season', opt.key); setSeason(opt.key) }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium border transition ${season === opt.key ? 'bg-rose-500 text-white border-rose-500' : 'border-gray-300 text-gray-700 hover:border-rose-300'}`}>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-gray-400 mt-3">Настройка сохраняется в этом браузере.</p>
       </section>
 
       {/* Updates */}

@@ -13,6 +13,9 @@ import SettingsPage from './pages/admin/SettingsPage'
 import MasterLayout from './pages/master/MasterLayout'
 import CalendarPage from './pages/master/CalendarPage'
 import WorkingHoursPage from './pages/master/WorkingHoursPage'
+import PortfolioPage from './pages/master/PortfolioPage'
+import ReportsPage from './pages/admin/ReportsPage'
+import MastersGalleryPage from './pages/MastersGalleryPage'
 
 function RequireRole({ role, children }: { role: string; children: React.ReactNode }) {
   const { user } = useAuthStore()
@@ -26,6 +29,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<BookingPage />} />
+        <Route path="/masters" element={<MastersGalleryPage />} />
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/login" element={<LoginPage />} />
 
@@ -35,6 +39,7 @@ export default function App() {
           <Route path="masters" element={<MastersPage />} />
           <Route path="promotions" element={<PromotionsPage />} />
           <Route path="bookings" element={<BookingsPage />} />
+          <Route path="reports" element={<ReportsPage />} />
           <Route path="admins" element={<AdminsPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
@@ -43,6 +48,7 @@ export default function App() {
           <Route index element={<Navigate to="/master/calendar" replace />} />
           <Route path="calendar" element={<CalendarPage />} />
           <Route path="hours" element={<WorkingHoursPage />} />
+          <Route path="portfolio" element={<PortfolioPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

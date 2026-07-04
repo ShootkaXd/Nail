@@ -92,6 +92,38 @@ async function main() {
     })
   }
   console.log('Promotions created')
+
+  // Sample completed appointments so the accounting page isn't empty
+  const existingAppts = await prisma.appointment.count()
+  if (existingAppts === 0) {
+    const samples = [
+      { masterId: master1.id, service: s1, day: -3, hour: 10, status: 'completed' },
+      { masterId: master1.id, service: s2, day: -3, hour: 12, status: 'completed' },
+      { masterId: master1.id, service: s5, day: -1, hour: 15, status: 'completed' },
+      { masterId: master2.id, service: s3, day: -2, hour: 11, status: 'completed' },
+      { masterId: master2.id, service: s4, day: -1, hour: 14, status: 'confirmed' },
+    ]
+    for (const [i, sm] of samples.entries()) {
+      const start = new Date()
+      start.setDate(start.getDate() + sm.day)
+      start.setHours(sm.hour, 0, 0, 0)
+      const end = new Date(start.getTime() + sm.service.durationMinutes * 60 * 1000)
+      await prisma.appointment.create({
+        data: {
+          clientName: ['Ольга', 'Ирина', 'Елена', 'Наталья', 'Светлана'][i],
+          clientPhone: `+7 900 000 000${i}`,
+          clientEmail: null,
+          masterId: sm.masterId,
+          serviceId: sm.service.id,
+          startAt: start,
+          endAt: end,
+          status: sm.status,
+          totalPrice: sm.service.price,
+        },
+      })
+    }
+    console.log('Sample appointments created')
+  }
 }
 
 main()

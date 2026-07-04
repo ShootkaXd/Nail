@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/auth.store'
 const nav = [
   { to: '/master/calendar', label: 'Мой календарь', icon: '📅' },
   { to: '/master/hours', label: 'График работы', icon: '🕐' },
+  { to: '/master/portfolio', label: 'Портфолио', icon: '📷' },
 ]
 
 export default function MasterLayout() {

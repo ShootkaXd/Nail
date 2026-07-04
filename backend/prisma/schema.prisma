@@ -40,6 +40,16 @@ model MasterProfile {
   bio            String?
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   masterServices MasterService[]
+  photos         MasterPhoto[]
+}
+
+model MasterPhoto {
+  id        Int           @id @default(autoincrement())
+  masterId  Int
+  url       String
+  caption   String?
+  createdAt DateTime      @default(now())
+  master    MasterProfile @relation(fields: [masterId], references: [id], onDelete: Cascade)
 }
 
 model MasterService {

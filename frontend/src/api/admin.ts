@@ -1,5 +1,5 @@
 import api from './client'
-import type { Service, Master, Promotion, Appointment, WorkingHour } from '../types'
+import type { Service, Master, Promotion, Appointment, WorkingHour, MasterPhoto } from '../types'
 
 export const servicesApi = {
   list: () => api.get<Service[]>('/services').then(r => r.data),
@@ -40,6 +40,30 @@ export const masterApi = {
   getWorkingHours: () => api.get<WorkingHour[]>('/working-hours').then(r => r.data),
   saveWorkingHours: (hours: WorkingHour[]) =>
     api.put<WorkingHour[]>('/working-hours', hours).then(r => r.data),
+  myServices: () => api.get<Service[]>('/master/my-services').then(r => r.data),
+  createAppointment: (data: { clientName: string; clientPhone: string; clientEmail?: string; serviceId: number; startAt: string; notes?: string; status?: string }) =>
+    api.post<Appointment>('/appointments', data).then(r => r.data),
+  listPhotos: () => api.get<MasterPhoto[]>('/master/photos').then(r => r.data),
+  uploadPhoto: (file: File, caption?: string) => {
+    const fd = new FormData()
+    fd.append('photo', file)
+    if (caption) fd.append('caption', caption)
+    return api.post<MasterPhoto>('/master/photos', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
+  },
+  deletePhoto: (id: number) => api.delete(`/master/photos/${id}`),
+}
+
+export interface EarningsReport {
+  total: number
+  count: number
+  byService: Array<{ serviceId: number; name: string; category: string; count: number; total: number }>
+  byMaster: Array<{ masterId: number; name: string; count: number; total: number }>
+  byCategory: Array<{ category: string; count: number; total: number }>
+}
+
+export const reportsApi = {
+  earnings: (params?: { from?: string; to?: string; statuses?: string }) =>
+    api.get<EarningsReport>('/reports/earnings', { params }).then(r => r.data),
 }
 
 export const adminsApi = {

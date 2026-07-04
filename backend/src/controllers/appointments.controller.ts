@@ -1,9 +1,69 @@
 import { Request, Response } from 'express'
 import prisma from '../lib/prisma'
+import { calculatePrice } from '../services/price.service'
 
 const include = {
   master: { select: { id: true, name: true } },
   service: { select: { id: true, name: true, category: true } },
+}
+
+// Services offered by the current master (for their own booking form)
+export async function myServices(req: Request, res: Response) {
+  const profile = await prisma.masterProfile.findUnique({
+    where: { userId: req.user!.id },
+    include: { masterServices: { include: { service: true } } },
+  })
+  if (!profile) return res.json([])
+  const services = profile.masterServices
+    .map(ms => ms.service)
+    .filter(s => s.isActive)
+  res.json(services)
+}
+
+// Master (or admin) books a client manually.
+// Master can only book for themselves; admin must pass masterId.
+export async function createByStaff(req: Request, res: Response) {
+  const { clientName, clientPhone, clientEmail, serviceId, startAt, notes, status } = req.body
+  const masterId = req.user!.role === 'master' ? req.user!.id : Number(req.body.masterId)
+
+  if (!clientName || !clientPhone || !serviceId || !startAt || !masterId) {
+    return res.status(400).json({ error: 'Заполните обязательные поля' })
+  }
+
+  const service = await prisma.service.findUnique({ where: { id: Number(serviceId) } })
+  if (!service) return res.status(404).json({ error: 'Услуга не найдена' })
+
+  const start = new Date(startAt)
+  const end = new Date(start.getTime() + service.durationMinutes * 60 * 1000)
+
+  const conflict = await prisma.appointment.findFirst({
+    where: {
+      masterId,
+      status: { notIn: ['cancelled'] },
+      startAt: { lt: end },
+      endAt: { gt: start },
+    },
+  })
+  if (conflict) return res.status(409).json({ error: 'Это время уже занято' })
+
+  const priceInfo = await calculatePrice(Number(serviceId), masterId)
+
+  const appointment = await prisma.appointment.create({
+    data: {
+      clientName,
+      clientPhone,
+      clientEmail: clientEmail || null,
+      masterId,
+      serviceId: Number(serviceId),
+      startAt: start,
+      endAt: end,
+      notes: notes || null,
+      totalPrice: priceInfo.finalPrice,
+      status: status && ['pending', 'confirmed', 'completed'].includes(status) ? status : 'confirmed',
+    },
+    include,
+  })
+  res.status(201).json(appointment)
 }
 
 export async function listAll(req: Request, res: Response) {

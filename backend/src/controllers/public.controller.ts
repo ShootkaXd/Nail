@@ -45,6 +45,27 @@ export async function getMasters(req: Request, res: Response) {
   res.json(users)
 }
 
+// Public gallery: all masters with bio + photos + services offered
+export async function getMastersGallery(_req: Request, res: Response) {
+  const users = await prisma.user.findMany({
+    where: { role: 'master', masterProfile: { isNot: null } },
+    select: {
+      id: true,
+      name: true,
+      masterProfile: {
+        select: {
+          id: true,
+          bio: true,
+          photos: { select: { id: true, url: true, caption: true }, orderBy: { createdAt: 'desc' } },
+          masterServices: { select: { service: { select: { id: true, name: true, category: true } } } },
+        },
+      },
+    },
+    orderBy: { name: 'asc' },
+  })
+  res.json(users)
+}
+
 export async function getSlots(req: Request, res: Response) {
   const { masterId, serviceId, date } = req.query
   if (!masterId || !serviceId || !date) {

@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
+import path from 'path'
 import router from './routes'
 import { errorHandler } from './middleware/errorHandler'
 import { apiLimiter } from './middleware/rateLimit'
@@ -32,6 +33,10 @@ app.use(
 
 app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'))
 app.use(express.json({ limit: '100kb' }))
+
+// Serve uploaded master photos
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads')
+app.use('/uploads', express.static(UPLOAD_DIR))
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }))
 
