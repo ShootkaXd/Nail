@@ -11,6 +11,7 @@ export interface Service {
 export interface MasterProfile {
   id: number
   bio: string | null
+  address?: string | null
   masterServices: Array<{ serviceId: number; customPrice: number | null }>
 }
 
@@ -79,6 +80,7 @@ export interface GalleryMaster {
   masterProfile: {
     id: number
     bio: string | null
+    address?: string | null
     photos: MasterPhoto[]
     masterServices: Array<{ service: { id: number; name: string; category: string } }>
   } | null

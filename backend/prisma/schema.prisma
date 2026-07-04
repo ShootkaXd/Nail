@@ -38,6 +38,7 @@ model MasterProfile {
   id             Int             @id @default(autoincrement())
   userId         Int             @unique
   bio            String?
+  address        String?
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   masterServices MasterService[]
   photos         MasterPhoto[]

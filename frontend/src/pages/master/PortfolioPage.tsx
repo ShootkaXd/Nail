@@ -35,10 +35,45 @@ export default function PortfolioPage() {
     load()
   }
 
+  // Own profile (bio + address)
+  const [profile, setProfile] = useState({ bio: '', address: '' })
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileSaved, setProfileSaved] = useState(false)
+
+  useEffect(() => {
+    masterApi.getProfile().then(p => setProfile({ bio: p.bio ?? '', address: p.address ?? '' })).catch(() => {})
+  }, [])
+
+  const saveProfile = async () => {
+    setSavingProfile(true)
+    await masterApi.updateProfile(profile)
+    setSavingProfile(false)
+    setProfileSaved(true)
+    setTimeout(() => setProfileSaved(false), 2000)
+  }
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Моё портфолио</h1>
       <p className="text-gray-500 text-sm mb-6">Фотографии работ видны клиентам на странице «Наши мастера».</p>
+
+      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 max-w-lg">
+        <h2 className="font-semibold text-gray-900 mb-3">Мой профиль</h2>
+        <div className="space-y-3">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">О себе</label>
+            <textarea value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} rows={2}
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none" />
+          </div>
+          <Input label="Адрес приёма" value={profile.address} onChange={e => setProfile(p => ({ ...p, address: e.target.value }))}
+            placeholder="г. Москва, ул. Ленина 10, салон «Роза»" />
+          <div className="flex items-center gap-3">
+            <Button onClick={saveProfile} loading={savingProfile}>Сохранить профиль</Button>
+            {profileSaved && <span className="text-sm text-green-600">✓ Сохранено</span>}
+          </div>
+          <p className="text-xs text-gray-400">Адрес виден клиентам при выборе мастера и в подтверждении записи.</p>
+        </div>
+      </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 max-w-lg">
         <Input label="Подпись к фото (необязательно)" value={caption} onChange={e => setCaption(e.target.value)} placeholder="Например: Гель-лак, френч" />

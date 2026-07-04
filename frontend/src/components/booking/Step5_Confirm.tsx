@@ -51,6 +51,7 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
       <div className="max-w-md bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
         <Row label="Услуга" value={service?.name ?? ''} />
         <Row label="Мастер" value={master?.name ?? ''} />
+        {master?.masterProfile?.address && <Row label="Адрес" value={master.masterProfile.address} />}
         <Row label="Дата" value={dateStr ?? ''} />
         <Row label="Время" value={timeStr ?? ''} />
         <Row label="Длительность" value={`${service?.durationMinutes} мин`} />

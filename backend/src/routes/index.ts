@@ -4,7 +4,7 @@ import { authenticate, requireRole } from '../middleware/auth'
 import { authLimiter, bookingLimiter } from '../middleware/rateLimit'
 import { validateBody, loginSchema, setupSchema, createAppointmentSchema } from '../lib/validation'
 import { listServices, createService, updateService, deleteService } from '../controllers/services.controller'
-import { listMasters, createMaster, updateMaster, deleteMaster } from '../controllers/masters.controller'
+import { listMasters, createMaster, updateMaster, deleteMaster, getMyProfile, updateMyProfile } from '../controllers/masters.controller'
 import { listPromotions, createPromotion, updatePromotion, deletePromotion } from '../controllers/promotions.controller'
 import { getMyHours, saveMyHours, getMasterHours, saveMasterHours } from '../controllers/workingHours.controller'
 import { getServices, getMasters, getMastersGallery, getSlots, getPrice, createAppointment } from '../controllers/public.controller'
@@ -72,6 +72,8 @@ router.get('/reports/earnings', authenticate, requireRole('admin'), earnings)
 // Staff booking (master books own client, admin any)
 router.post('/appointments', authenticate, requireRole('master', 'admin'), createByStaff)
 router.get('/master/my-services', authenticate, requireRole('master'), myServices)
+router.get('/master/profile', authenticate, requireRole('master'), getMyProfile)
+router.put('/master/profile', authenticate, requireRole('master'), updateMyProfile)
 
 // Master portfolio photos
 router.get('/master/photos', authenticate, requireRole('master', 'admin'), listMyPhotos)

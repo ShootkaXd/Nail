@@ -46,6 +46,7 @@ export default function MastersGalleryPage() {
                     <div>
                       <h2 className="text-lg font-bold text-gray-900">{m.name}</h2>
                       {profile?.bio && <p className="text-sm text-gray-500 mt-0.5 max-w-2xl">{profile.bio}</p>}
+                      {profile?.address && <p className="text-sm text-gray-600 mt-1">📍 {profile.address}</p>}
                       {categories.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           {categories.map(c => (

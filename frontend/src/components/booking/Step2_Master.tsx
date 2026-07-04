@@ -52,6 +52,7 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
                   <div className="min-w-0">
                     <p className="font-bold text-gray-900">{m.name}</p>
                     {m.masterProfile?.bio && <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{m.masterProfile.bio}</p>}
+                    {m.masterProfile?.address && <p className="text-xs text-gray-400 mt-1">📍 {m.masterProfile.address}</p>}
                     <p className="text-rose-600 font-semibold mt-1">
                       {(customPrice ?? service.price).toLocaleString('ru-RU')} ₽
                       {customPrice && customPrice !== service.price && (

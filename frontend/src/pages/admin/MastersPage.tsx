@@ -65,7 +65,7 @@ function WorkingHoursEditor({ masterId, onClose }: { masterId: number; onClose: 
   )
 }
 
-type MasterForm = { name: string; login: string; email: string; phone: string; bio: string; password: string }
+type MasterForm = { name: string; login: string; email: string; phone: string; bio: string; address: string; password: string }
 
 function MasterFormComponent({ master, services, onSave, onCancel }: { master?: Master; services: Service[]; onSave: () => void; onCancel: () => void }) {
   const [selectedServices, setSelectedServices] = useState<number[]>(
@@ -73,7 +73,7 @@ function MasterFormComponent({ master, services, onSave, onCancel }: { master?: 
   )
   const [loading, setLoading] = useState(false)
   const { register, handleSubmit, formState: { errors } } = useForm<MasterForm>({
-    defaultValues: { name: master?.name ?? '', login: master?.login ?? '', email: '', phone: master?.phone ?? '', bio: master?.masterProfile?.bio ?? '', password: '' },
+    defaultValues: { name: master?.name ?? '', login: master?.login ?? '', email: '', phone: master?.phone ?? '', bio: master?.masterProfile?.bio ?? '', address: master?.masterProfile?.address ?? '', password: '' },
   })
 
   const submit = async (data: MasterForm): Promise<void> => {
@@ -99,6 +99,7 @@ function MasterFormComponent({ master, services, onSave, onCancel }: { master?: 
         <label className="text-sm font-medium text-gray-700">О мастере</label>
         <textarea {...register('bio')} rows={2} className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none" />
       </div>
+      <Input label="Адрес приёма" {...register('address')} placeholder="г. Москва, ул. Ленина 10, салон «Роза»" />
       {!master && <Input label="Пароль *" type="password" {...register('password', { required: true })} placeholder="Минимум 6 символов" error={errors.password ? 'Обязательное поле' : ''} />}
 
       <div>
@@ -156,6 +157,7 @@ export default function MastersPage() {
               </div>
             </div>
             {m.masterProfile?.bio && <p className="text-sm text-gray-500 mb-3 line-clamp-2">{m.masterProfile.bio}</p>}
+            {m.masterProfile?.address && <p className="text-xs text-gray-500 mb-3">📍 {m.masterProfile.address}</p>}
             <p className="text-xs text-gray-400 mb-3">
               Услуг: {m.masterProfile?.masterServices.length ?? 0}
             </p>

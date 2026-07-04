@@ -9,7 +9,7 @@ export async function listMasters(req: Request, res: Response) {
       id: true, name: true, login: true, email: true, phone: true,
       masterProfile: {
         select: {
-          id: true, bio: true,
+          id: true, bio: true, address: true,
           masterServices: { select: { serviceId: true, customPrice: true } },
         },
       },
@@ -20,7 +20,7 @@ export async function listMasters(req: Request, res: Response) {
 }
 
 export async function createMaster(req: Request, res: Response) {
-  const { name, login, email, phone, password, bio, serviceIds } = req.body
+  const { name, login, email, phone, password, bio, address, serviceIds } = req.body
   const passwordHash = await bcrypt.hash(password || "master123", 12)
 
   const user = await prisma.user.create({
@@ -29,6 +29,7 @@ export async function createMaster(req: Request, res: Response) {
       masterProfile: {
         create: {
           bio: bio || null,
+          address: address || null,
           masterServices: serviceIds?.length
             ? { create: serviceIds.map((id: number) => ({ serviceId: id })) }
             : undefined,
@@ -42,7 +43,7 @@ export async function createMaster(req: Request, res: Response) {
 
 export async function updateMaster(req: Request, res: Response) {
   const id = Number(req.params.id)
-  const { name, login, email, phone, bio, serviceIds, password } = req.body
+  const { name, login, email, phone, bio, address, serviceIds, password } = req.body
 
   const updateData: Record<string, unknown> = {}
   if (name) updateData.name = name
@@ -58,6 +59,7 @@ export async function updateMaster(req: Request, res: Response) {
       masterProfile: {
         update: {
           bio: bio ?? undefined,
+          address: address ?? undefined,
           ...(serviceIds !== undefined && {
             masterServices: {
               deleteMany: {},
@@ -70,6 +72,29 @@ export async function updateMaster(req: Request, res: Response) {
     include: { masterProfile: { include: { masterServices: true } } },
   })
   res.json(user)
+}
+
+// Master reads own profile (bio + address)
+export async function getMyProfile(req: Request, res: Response) {
+  const profile = await prisma.masterProfile.findUnique({
+    where: { userId: req.user!.id },
+    select: { bio: true, address: true },
+  })
+  res.json(profile ?? { bio: null, address: null })
+}
+
+// Master updates own profile (bio + address)
+export async function updateMyProfile(req: Request, res: Response) {
+  const { bio, address } = req.body
+  const profile = await prisma.masterProfile.update({
+    where: { userId: req.user!.id },
+    data: {
+      bio: bio !== undefined ? String(bio).slice(0, 1000) || null : undefined,
+      address: address !== undefined ? String(address).slice(0, 300) || null : undefined,
+    },
+    select: { bio: true, address: true },
+  })
+  res.json(profile)
 }
 
 export async function deleteMaster(req: Request, res: Response) {

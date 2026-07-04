@@ -10,9 +10,9 @@ export const servicesApi = {
 
 export const mastersApi = {
   list: () => api.get<Master[]>('/masters').then(r => r.data),
-  create: (data: { name: string; login: string; email?: string; phone?: string; password?: string; bio?: string; serviceIds?: number[] }) =>
+  create: (data: { name: string; login: string; email?: string; phone?: string; password?: string; bio?: string; address?: string; serviceIds?: number[] }) =>
     api.post<Master>('/masters', data).then(r => r.data),
-  update: (id: number, data: Partial<{ name: string; login: string; email: string; phone: string; bio: string; serviceIds: number[]; password: string }>) =>
+  update: (id: number, data: Partial<{ name: string; login: string; email: string; phone: string; bio: string; address: string; serviceIds: number[]; password: string }>) =>
     api.put<Master>(`/masters/${id}`, data).then(r => r.data),
   delete: (id: number) => api.delete(`/masters/${id}`),
   getWorkingHours: (id: number) => api.get<WorkingHour[]>(`/masters/${id}/working-hours`).then(r => r.data),
@@ -51,6 +51,9 @@ export const masterApi = {
     return api.post<MasterPhoto>('/master/photos', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
   },
   deletePhoto: (id: number) => api.delete(`/master/photos/${id}`),
+  getProfile: () => api.get<{ bio: string | null; address: string | null }>('/master/profile').then(r => r.data),
+  updateProfile: (data: { bio?: string; address?: string }) =>
+    api.put<{ bio: string | null; address: string | null }>('/master/profile', data).then(r => r.data),
 }
 
 export interface EarningsReport {
