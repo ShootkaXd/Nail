@@ -35,7 +35,10 @@ export default function SetupPage() {
       doLogin(token, user as AuthUser)
       navigate('/admin', { replace: true })
     } catch (e: unknown) {
-      setError((e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Ошибка настройки')
+      const err = e as { response?: { status?: number; data?: { error?: string } }; message?: string }
+      if (err.response?.data?.error) setError(err.response.data.error)
+      else if (err.response?.status) setError(`Сервер вернул ошибку ${err.response.status}. Проверьте логи: docker compose logs backend`)
+      else setError('Нет соединения с сервером (API недоступен)')
     } finally {
       setLoading(false)
     }
