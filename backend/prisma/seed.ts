@@ -1,6 +1,12 @@
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcryptjs'
 
+function normalizePhoneDigits(raw: string): string {
+  let digits = (raw || '').replace(/\D/g, '')
+  if (digits.length === 11 && (digits[0] === '7' || digits[0] === '8')) digits = digits.slice(1)
+  return digits.slice(-10)
+}
+
 const prisma = new PrismaClient()
 
 async function main() {
@@ -108,10 +114,12 @@ async function main() {
       start.setDate(start.getDate() + sm.day)
       start.setHours(sm.hour, 0, 0, 0)
       const end = new Date(start.getTime() + sm.service.durationMinutes * 60 * 1000)
+      const clientPhone = `+7 900 000 000${i}`
       await prisma.appointment.create({
         data: {
           clientName: ['Ольга', 'Ирина', 'Елена', 'Наталья', 'Светлана'][i],
-          clientPhone: `+7 900 000 000${i}`,
+          clientPhone,
+          clientPhoneDigits: normalizePhoneDigits(clientPhone),
           clientEmail: null,
           masterId: sm.masterId,
           serviceId: sm.service.id,

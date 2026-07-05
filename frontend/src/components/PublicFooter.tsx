@@ -15,6 +15,7 @@ export default function PublicFooter() {
             Политика обработки персональных данных
           </Link>
           <Link to="/masters" className="hover:text-gray-700">Наши мастера</Link>
+          <Link to="/my-bookings" className="hover:text-gray-700">Мои записи</Link>
         </div>
         {(r.companyName || r.inn || r.address) && (
           <p>

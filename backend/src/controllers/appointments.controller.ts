@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import prisma from '../lib/prisma'
 import { calculatePrice } from '../services/price.service'
+import { normalizePhoneDigits } from '../lib/phone'
 
 const include = {
   master: { select: { id: true, name: true } },
@@ -52,6 +53,7 @@ export async function createByStaff(req: Request, res: Response) {
     data: {
       clientName,
       clientPhone,
+      clientPhoneDigits: normalizePhoneDigits(clientPhone),
       clientEmail: clientEmail || null,
       masterId,
       serviceId: Number(serviceId),

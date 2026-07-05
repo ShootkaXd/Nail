@@ -18,6 +18,15 @@ export const bookingLimiter = rateLimit({
   message: { error: 'Слишком много запросов. Попробуйте через минуту.' },
 })
 
+// Limiter for "my bookings" phone lookup — mitigates enumeration of phone numbers
+export const myBookingsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Слишком много запросов. Попробуйте позже.' },
+})
+
 // General API limiter
 export const apiLimiter = rateLimit({
   windowMs: 60 * 1000,

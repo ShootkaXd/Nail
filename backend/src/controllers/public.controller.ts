@@ -3,6 +3,7 @@ import prisma from '../lib/prisma'
 import { getAvailableSlots } from '../services/slot.service'
 import { calculatePrice } from '../services/price.service'
 import { getBookingForm } from './settings.controller'
+import { normalizePhoneDigits } from '../lib/phone'
 
 export async function getServices(req: Request, res: Response) {
   const services = await prisma.service.findMany({
@@ -120,6 +121,7 @@ export async function createAppointment(req: Request, res: Response) {
     data: {
       clientName,
       clientPhone,
+      clientPhoneDigits: normalizePhoneDigits(clientPhone),
       clientEmail: clientEmail || null,
       masterId: Number(masterId),
       serviceId: Number(serviceId),
@@ -133,4 +135,53 @@ export async function createAppointment(req: Request, res: Response) {
   })
 
   res.status(201).json(appointment)
+}
+
+const myAppointmentsInclude = {
+  master: { select: { id: true, name: true } },
+  service: { select: { id: true, name: true, category: true } },
+}
+
+// Client looks up their own bookings by phone number — no account needed.
+export async function getMyAppointments(req: Request, res: Response) {
+  const { phone } = req.query
+  if (!phone) return res.status(400).json({ error: 'Укажите номер телефона' })
+
+  const digits = normalizePhoneDigits(String(phone))
+  if (digits.length !== 10) return res.status(400).json({ error: 'Введите номер телефона полностью' })
+
+  const appointments = await prisma.appointment.findMany({
+    where: { clientPhoneDigits: digits },
+    include: myAppointmentsInclude,
+    orderBy: { startAt: 'desc' },
+    take: 100,
+  })
+  res.json(appointments)
+}
+
+// Client cancels their own upcoming booking — verified by phone match, not just ID.
+export async function cancelMyAppointment(req: Request, res: Response) {
+  const id = Number(req.params.id)
+  const { phone } = req.body
+  if (!phone) return res.status(400).json({ error: 'Укажите номер телефона' })
+
+  const digits = normalizePhoneDigits(String(phone))
+  const appointment = await prisma.appointment.findUnique({ where: { id } })
+
+  if (!appointment || appointment.clientPhoneDigits !== digits) {
+    return res.status(404).json({ error: 'Запись не найдена' })
+  }
+  if (!['pending', 'confirmed'].includes(appointment.status)) {
+    return res.status(400).json({ error: 'Эту запись нельзя отменить' })
+  }
+  if (appointment.startAt.getTime() < Date.now()) {
+    return res.status(400).json({ error: 'Запись уже прошла' })
+  }
+
+  const updated = await prisma.appointment.update({
+    where: { id },
+    data: { status: 'cancelled' },
+    include: myAppointmentsInclude,
+  })
+  res.json(updated)
 }

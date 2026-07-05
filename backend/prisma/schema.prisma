@@ -85,20 +85,23 @@ model WorkingHour {
 }
 
 model Appointment {
-  id          Int      @id @default(autoincrement())
-  clientName  String
-  clientPhone String
-  clientEmail String?
-  masterId    Int
-  serviceId   Int
-  startAt     DateTime
-  endAt       DateTime
-  status      String   @default("pending")
-  notes       String?
-  totalPrice  Float
-  createdAt   DateTime @default(now())
-  master      User     @relation("MasterAppointments", fields: [masterId], references: [id])
-  service     Service  @relation(fields: [serviceId], references: [id])
+  id                Int      @id @default(autoincrement())
+  clientName        String
+  clientPhone       String
+  clientPhoneDigits String   @default("") // normalized last-10-digits, for "my bookings" lookup
+  clientEmail       String?
+  masterId          Int
+  serviceId         Int
+  startAt           DateTime
+  endAt             DateTime
+  status            String   @default("pending")
+  notes             String?
+  totalPrice        Float
+  createdAt         DateTime @default(now())
+  master            User     @relation("MasterAppointments", fields: [masterId], references: [id])
+  service           Service  @relation(fields: [serviceId], references: [id])
+
+  @@index([clientPhoneDigits])
 }
 
 model Setting {

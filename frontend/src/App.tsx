@@ -17,6 +17,7 @@ import PortfolioPage from './pages/master/PortfolioPage'
 import ReportsPage from './pages/admin/ReportsPage'
 import MastersGalleryPage from './pages/MastersGalleryPage'
 import PrivacyPage from './pages/PrivacyPage'
+import MyBookingsPage from './pages/MyBookingsPage'
 
 function RequireRole({ role, children }: { role: string; children: React.ReactNode }) {
   const { user } = useAuthStore()
@@ -31,6 +32,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<BookingPage />} />
         <Route path="/masters" element={<MastersGalleryPage />} />
+        <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/login" element={<LoginPage />} />

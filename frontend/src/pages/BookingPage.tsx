@@ -64,6 +64,9 @@ export default function BookingPage() {
             <Link to="/masters" className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 transition-colors px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100">
               Мастера
             </Link>
+            <Link to="/my-bookings" className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 transition-colors px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100">
+              Мои записи
+            </Link>
             <Link to="/login" className="text-xs sm:text-sm text-gray-400 hover:text-gray-600 transition-colors px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100">
               Вход
             </Link>

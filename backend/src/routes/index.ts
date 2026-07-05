@@ -1,13 +1,13 @@
 import { Router } from 'express'
 import { login, me } from '../controllers/auth.controller'
 import { authenticate, requireRole } from '../middleware/auth'
-import { authLimiter, bookingLimiter } from '../middleware/rateLimit'
+import { authLimiter, bookingLimiter, myBookingsLimiter } from '../middleware/rateLimit'
 import { validateBody, loginSchema, setupSchema, createAppointmentSchema } from '../lib/validation'
 import { listServices, createService, updateService, deleteService } from '../controllers/services.controller'
 import { listMasters, createMaster, updateMaster, deleteMaster, getMyProfile, updateMyProfile } from '../controllers/masters.controller'
 import { listPromotions, createPromotion, updatePromotion, deletePromotion } from '../controllers/promotions.controller'
 import { getMyHours, saveMyHours, getMasterHours, saveMasterHours } from '../controllers/workingHours.controller'
-import { getServices, getMasters, getMastersGallery, getSlots, getPrice, createAppointment } from '../controllers/public.controller'
+import { getServices, getMasters, getMastersGallery, getSlots, getPrice, createAppointment, getMyAppointments, cancelMyAppointment } from '../controllers/public.controller'
 import { listAll, listMine, updateStatus, myServices, createByStaff } from '../controllers/appointments.controller'
 import { earnings } from '../controllers/reports.controller'
 import { uploadMiddleware, uploadPhoto, listMyPhotos, deletePhoto } from '../controllers/photos.controller'
@@ -31,6 +31,8 @@ router.get('/public/price', getPrice)
 router.get('/public/form-config', getBookingFormPublic)
 router.get('/public/masters-gallery', getMastersGallery)
 router.post('/public/appointments', bookingLimiter, validateBody(createAppointmentSchema), createAppointment)
+router.get('/public/my-appointments', myBookingsLimiter, getMyAppointments)
+router.put('/public/appointments/:id/cancel', myBookingsLimiter, cancelMyAppointment)
 
 // Auth
 router.post('/auth/login', authLimiter, validateBody(loginSchema), login)
