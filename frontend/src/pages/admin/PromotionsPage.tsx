@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Plus } from 'lucide-react'
 import { promotionsApi, servicesApi } from '../../api/admin'
 import type { Promotion, Service } from '../../types'
 import Button from '../../components/ui/Button'
@@ -47,7 +48,7 @@ function PromotionForm({ promo, services, onSave, onCancel }: { promo?: Promotio
         <Input label="Конец *" type="date" {...register('endDate', { required: true })} />
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" {...register('isActive')} className="accent-rose-500" />
+        <input type="checkbox" {...register('isActive')} className="accent-brand-500" />
         <span className="text-sm font-medium text-gray-700">Акция активна</span>
       </label>
       <div className="flex gap-3 pt-2">
@@ -83,7 +84,9 @@ export default function PromotionsPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Акции и скидки</h1>
-        <Button onClick={() => setEditing('new')}>+ Добавить акцию</Button>
+        <Button onClick={() => setEditing('new')}>
+          <Plus className="w-4 h-4" /> Добавить акцию
+        </Button>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
@@ -108,7 +111,7 @@ export default function PromotionsPage() {
                   <td className="px-4 py-3 font-medium text-gray-900">{p.name}</td>
                   <td className="px-4 py-3 text-gray-600">{p.service?.name ?? 'Все услуги'}</td>
                   <td className="px-4 py-3">
-                    <span className="font-bold text-rose-600">-{p.discountPercent}%</span>
+                    <span className="font-bold text-brand-600">-{p.discountPercent}%</span>
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-xs">
                     {start.toLocaleDateString('ru-RU')} — {end.toLocaleDateString('ru-RU')}

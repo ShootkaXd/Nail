@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { useSiteConfig } from '../hooks/useSiteConfig'
 
 export default function PrivacyPage() {
@@ -11,11 +12,13 @@ export default function PrivacyPage() {
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-lg font-bold text-gray-900">Политика обработки персональных данных</h1>
-          <Link to="/" className="text-sm text-rose-500 hover:text-rose-600 shrink-0">← К записи</Link>
+          <Link to="/" className="text-sm text-brand-500 hover:text-brand-600 shrink-0 inline-flex items-center gap-1">
+            <ArrowLeft className="w-3.5 h-3.5" /> К записи
+          </Link>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8 prose-sm text-gray-700 space-y-5 text-sm leading-relaxed">
+      <main className="max-w-3xl mx-auto px-4 py-8 text-gray-700 space-y-5 text-sm leading-relaxed">
         <section>
           <h2 className="font-bold text-gray-900 mb-2">1. Общие положения</h2>
           <p>

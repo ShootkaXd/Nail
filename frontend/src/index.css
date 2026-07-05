@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Default calm, warm palette — overridden at runtime by admin theme settings (src/lib/theme.ts) */
+  --brand-50: #faf5f2;
+  --brand-100: #f3e8e1;
+  --brand-200: #e7d2c4;
+  --brand-300: #d4b29c;
+  --brand-400: #bc8f72;
+  --brand-500: #a06f50;
+  --brand-600: #8a5b3f;
+  --brand-700: #714a34;
+  --brand-800: #5c3c2b;
+  --brand-900: #4a3123;
+  --font-body: 'Manrope', system-ui, sans-serif;
+}
+
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+    @apply bg-gray-50 text-gray-900 font-theme;
   }
 }

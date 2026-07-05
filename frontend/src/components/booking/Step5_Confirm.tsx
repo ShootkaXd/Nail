@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { publicApi } from '../../api/public'
 import type { BookingState } from '../../pages/BookingPage'
 import Button from '../ui/Button'
@@ -45,7 +46,9 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
 
   return (
     <div>
-      <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4">← Назад</button>
+      <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1">
+        <ArrowLeft className="w-4 h-4" /> Назад
+      </button>
       <h2 className="text-2xl font-bold text-gray-900 mb-1">Подтверждение записи</h2>
       <p className="text-gray-500 mb-6">Проверьте данные перед подтверждением</p>
 
@@ -70,13 +73,13 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
               {priceInfo.promotionName && <Row label="Акция" value={priceInfo.promotionName} />}
               <div className="flex justify-between font-bold text-lg mt-2">
                 <span>Итого</span>
-                <span className="text-rose-600">{priceInfo.finalPrice.toLocaleString('ru-RU')} ₽</span>
+                <span className="text-brand-600">{priceInfo.finalPrice.toLocaleString('ru-RU')} ₽</span>
               </div>
             </>
           ) : (
             <div className="flex justify-between font-bold text-lg">
               <span>Итого</span>
-              <span className="text-rose-600">{priceInfo?.finalPrice.toLocaleString('ru-RU')} ₽</span>
+              <span className="text-brand-600">{priceInfo?.finalPrice.toLocaleString('ru-RU')} ₽</span>
             </div>
           )}
         </div>
@@ -85,7 +88,9 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
       {error && <p className="mt-4 text-sm text-red-500 bg-red-50 px-4 py-3 rounded-xl">{error}</p>}
 
       <div className="flex gap-3 mt-6">
-        <Button variant="secondary" onClick={onBack} disabled={loading}>← Назад</Button>
+        <Button variant="secondary" onClick={onBack} disabled={loading}>
+          <ArrowLeft className="w-4 h-4" /> Назад
+        </Button>
         <Button onClick={handleConfirm} loading={loading} size="lg">
           Подтвердить запись
         </Button>

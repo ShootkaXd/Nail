@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/auth.store'
+import { useThemeLoader } from './hooks/useTheme'
 import BookingPage from './pages/BookingPage'
 import LoginPage from './pages/LoginPage'
 import SetupPage from './pages/SetupPage'
@@ -27,6 +28,7 @@ function RequireRole({ role, children }: { role: string; children: React.ReactNo
 }
 
 export default function App() {
+  useThemeLoader()
   return (
     <BrowserRouter>
       <Routes>

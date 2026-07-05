@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { MapPin, Sparkles } from 'lucide-react'
 import { publicApi } from '../api/public'
 import { useSeason } from '../hooks/useSeason'
 import { useSiteConfig } from '../hooks/useSiteConfig'
 import SeasonalEffects from '../components/SeasonalEffects'
 import PublicFooter from '../components/PublicFooter'
+import Avatar from '../components/ui/Avatar'
 import type { GalleryMaster, MasterPhoto } from '../types'
 import Spinner from '../components/ui/Spinner'
 
@@ -28,11 +30,13 @@ export default function MastersGalleryPage() {
             {site.logoUrl ? (
               <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-xl object-cover shrink-0" />
             ) : (
-              <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0">💅</div>
+              <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
             )}
             <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">Наши мастера</h1>
           </div>
-          <Link to="/" className="bg-rose-500 hover:bg-rose-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+          <Link to="/" className="bg-brand-500 hover:bg-brand-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
             Записаться
           </Link>
         </div>
@@ -49,17 +53,19 @@ export default function MastersGalleryPage() {
               return (
                 <section key={m.id} className="bg-white rounded-2xl border border-gray-200 p-6">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white text-2xl font-bold shrink-0">
-                      {m.name.charAt(0)}
-                    </div>
+                    <Avatar name={m.name} url={profile?.avatarUrl} size={64} />
                     <div>
                       <h2 className="text-lg font-bold text-gray-900">{m.name}</h2>
                       {profile?.bio && <p className="text-sm text-gray-500 mt-0.5 max-w-2xl">{profile.bio}</p>}
-                      {profile?.address && <p className="text-sm text-gray-600 mt-1">📍 {profile.address}</p>}
+                      {profile?.address && (
+                        <p className="text-sm text-gray-600 mt-1 flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 shrink-0" /> {profile.address}
+                        </p>
+                      )}
                       {categories.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 mt-2">
                           {categories.map(c => (
-                            <span key={c} className="text-xs bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full">{c}</span>
+                            <span key={c} className="text-xs bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full">{c}</span>
                           ))}
                         </div>
                       )}

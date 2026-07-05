@@ -29,6 +29,7 @@ const imageUpload = multer({
 
 export const uploadMiddleware = imageUpload.single('photo')
 export const logoUploadMiddleware = imageUpload.single('logo')
+export const avatarUploadMiddleware = imageUpload.single('avatar')
 
 async function resolveProfileId(userId: number, role: string, bodyMasterId?: unknown): Promise<number | null> {
   if (role === 'admin' && bodyMasterId) {
@@ -56,6 +57,21 @@ export async function uploadPhoto(req: Request, res: Response) {
     },
   })
   res.status(201).json(photo)
+}
+
+// Upload a master's own profile photo (avatar shown instead of initials)
+export async function uploadAvatar(req: Request, res: Response) {
+  if (!req.file) return res.status(400).json({ error: 'Файл не загружен' })
+
+  const profileId = await resolveProfileId(req.user!.id, req.user!.role, req.body.masterId)
+  if (!profileId) {
+    fs.unlink(path.join(UPLOAD_DIR, req.file.filename), () => {})
+    return res.status(404).json({ error: 'Профиль мастера не найден' })
+  }
+
+  const url = `/uploads/${req.file.filename}`
+  await prisma.masterProfile.update({ where: { id: profileId }, data: { avatarUrl: url } })
+  res.json({ avatarUrl: url })
 }
 
 export async function listMyPhotos(req: Request, res: Response) {

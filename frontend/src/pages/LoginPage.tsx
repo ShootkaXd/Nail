@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ArrowLeft, Sparkles } from 'lucide-react'
 import { authApi } from '../api/admin'
 import { useAuthStore } from '../store/auth.store'
 import { useSiteConfig } from '../hooks/useSiteConfig'
@@ -36,13 +37,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
         <div className="text-center mb-8">
           {site.logoUrl ? (
             <img src={site.logoUrl} alt={site.salonName} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-4" />
           ) : (
-            <div className="w-16 h-16 bg-rose-500 rounded-2xl flex items-center justify-center text-white text-3xl mx-auto mb-4">💅</div>
+            <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4">
+              <Sparkles className="w-8 h-8" />
+            </div>
           )}
           <h1 className="text-2xl font-bold text-gray-900">{site.salonName}</h1>
           <p className="text-gray-500 text-sm mt-1">Вход для сотрудников</p>
@@ -72,7 +75,9 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-6 text-center">
-          <a href="/" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">← Вернуться к записи</a>
+          <a href="/" className="text-sm text-gray-400 hover:text-gray-600 transition-colors inline-flex items-center gap-1">
+            <ArrowLeft className="w-3.5 h-3.5" /> Вернуться к записи
+          </a>
         </p>
       </div>
     </div>

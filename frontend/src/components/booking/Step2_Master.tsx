@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { ArrowLeft, MapPin } from 'lucide-react'
 import { publicApi } from '../../api/public'
 import type { Master, Service } from '../../types'
 import Spinner from '../ui/Spinner'
 import Button from '../ui/Button'
+import Avatar from '../ui/Avatar'
 
 interface Props {
   service: Service
@@ -24,7 +26,7 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
   return (
     <div>
       <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1">
-        ← Назад
+        <ArrowLeft className="w-4 h-4" /> Назад
       </button>
       <h2 className="text-2xl font-bold text-gray-900 mb-1">Выберите мастера</h2>
       <p className="text-gray-500 mb-6">Услуга: <span className="font-medium text-gray-700">{service.name}</span></p>
@@ -41,19 +43,21 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
                 onClick={() => onSelect(m)}
                 className={`text-left p-5 rounded-xl border-2 transition-all ${
                   selected?.id === m.id
-                    ? 'border-rose-500 bg-rose-50'
-                    : 'border-gray-200 bg-white hover:border-rose-300 hover:shadow-sm'
+                    ? 'border-brand-500 bg-brand-50'
+                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white text-xl font-bold shrink-0">
-                    {m.name.charAt(0)}
-                  </div>
+                  <Avatar name={m.name} url={m.masterProfile?.avatarUrl} size={56} />
                   <div className="min-w-0">
                     <p className="font-bold text-gray-900">{m.name}</p>
                     {m.masterProfile?.bio && <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{m.masterProfile.bio}</p>}
-                    {m.masterProfile?.address && <p className="text-xs text-gray-400 mt-1">📍 {m.masterProfile.address}</p>}
-                    <p className="text-rose-600 font-semibold mt-1">
+                    {m.masterProfile?.address && (
+                      <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                        <MapPin className="w-3 h-3 shrink-0" /> {m.masterProfile.address}
+                      </p>
+                    )}
+                    <p className="text-brand-600 font-semibold mt-1">
                       {(customPrice ?? service.price).toLocaleString('ru-RU')} ₽
                       {customPrice && customPrice !== service.price && (
                         <span className="text-xs text-gray-400 ml-1 line-through">{service.price.toLocaleString('ru-RU')} ₽</span>
@@ -68,7 +72,9 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
       )}
 
       <div className="mt-6">
-        <Button variant="secondary" onClick={onBack}>← Назад</Button>
+        <Button variant="secondary" onClick={onBack}>
+          <ArrowLeft className="w-4 h-4" /> Назад
+        </Button>
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Plus } from 'lucide-react'
 import { servicesApi } from '../../api/admin'
 import type { Service } from '../../types'
 import Button from '../../components/ui/Button'
@@ -28,7 +29,7 @@ function ServiceForm({ service, onSave, onCancel }: { service?: Service; onSave:
       <Input label="Название *" {...register('name', { required: true })} error={errors.name ? 'Обязательное поле' : ''} />
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-gray-700">Описание</label>
-        <textarea {...register('description')} rows={2} className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none" />
+        <textarea {...register('description')} rows={2} className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none" />
       </div>
       <Input label="Категория *" {...register('category', { required: true })} placeholder="Маникюр" error={errors.category ? 'Обязательное поле' : ''} />
       <div className="grid grid-cols-2 gap-3">
@@ -36,7 +37,7 @@ function ServiceForm({ service, onSave, onCancel }: { service?: Service; onSave:
         <Input label="Цена (₽) *" type="number" {...register('price', { required: true, min: 0 })} />
       </div>
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="checkbox" {...register('isActive')} className="rounded accent-rose-500" />
+        <input type="checkbox" {...register('isActive')} className="rounded accent-brand-500" />
         <span className="text-sm font-medium text-gray-700">Услуга активна</span>
       </label>
       <div className="flex gap-3 pt-2">
@@ -66,7 +67,9 @@ export default function ServicesPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Услуги</h1>
-        <Button onClick={() => setEditing('new')}>+ Добавить услугу</Button>
+        <Button onClick={() => setEditing('new')}>
+          <Plus className="w-4 h-4" /> Добавить услугу
+        </Button>
       </div>
 
       {Object.entries(grouped).map(([cat, items]) => (

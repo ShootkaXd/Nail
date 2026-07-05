@@ -10,11 +10,11 @@ import { getMyHours, saveMyHours, getMasterHours, saveMasterHours } from '../con
 import { getServices, getMasters, getMastersGallery, getSlots, getPrice, createAppointment, getMyAppointments, cancelMyAppointment } from '../controllers/public.controller'
 import { listAll, listMine, updateStatus, myServices, createByStaff } from '../controllers/appointments.controller'
 import { earnings } from '../controllers/reports.controller'
-import { uploadMiddleware, uploadPhoto, listMyPhotos, deletePhoto } from '../controllers/photos.controller'
+import { uploadMiddleware, uploadPhoto, listMyPhotos, deletePhoto, uploadAvatar } from '../controllers/photos.controller'
 import { setupStatus, setup } from '../controllers/setup.controller'
 import { listAdmins, createAdmin, deleteAdmin, changePassword } from '../controllers/admins.controller'
-import { getBookingFormPublic, updateBookingForm, getSitePublic, updateSite, uploadLogo } from '../controllers/settings.controller'
-import { logoUploadMiddleware } from '../controllers/photos.controller'
+import { getBookingFormPublic, updateBookingForm, getSitePublic, updateSite, uploadLogo, getThemePublic, updateTheme } from '../controllers/settings.controller'
+import { logoUploadMiddleware, avatarUploadMiddleware } from '../controllers/photos.controller'
 import { versionInfo, checkUpdates } from '../controllers/system.controller'
 
 const router = Router()
@@ -70,6 +70,10 @@ router.get('/public/site-config', getSitePublic)
 router.put('/settings/site', authenticate, requireRole('admin'), updateSite)
 router.post('/settings/logo', authenticate, requireRole('admin'), logoUploadMiddleware, uploadLogo)
 
+// Theme config (public read; admin write)
+router.get('/public/theme', getThemePublic)
+router.put('/settings/theme', authenticate, requireRole('admin'), updateTheme)
+
 // Admin — system / updates
 router.get('/system/version', authenticate, requireRole('admin'), versionInfo)
 router.get('/system/check-updates', authenticate, requireRole('admin'), checkUpdates)
@@ -87,6 +91,7 @@ router.put('/master/profile', authenticate, requireRole('master'), updateMyProfi
 router.get('/master/photos', authenticate, requireRole('master', 'admin'), listMyPhotos)
 router.post('/master/photos', authenticate, requireRole('master', 'admin'), uploadMiddleware, uploadPhoto)
 router.delete('/master/photos/:id', authenticate, requireRole('master', 'admin'), deletePhoto)
+router.post('/master/avatar', authenticate, requireRole('master', 'admin'), avatarUploadMiddleware, uploadAvatar)
 
 // Admin — all appointments
 router.get('/appointments', authenticate, requireRole('admin'), listAll)

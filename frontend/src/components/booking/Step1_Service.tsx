@@ -37,8 +37,8 @@ export default function Step1Service({ selected, onSelect }: Props) {
                 onClick={() => onSelect(s)}
                 className={`text-left p-4 rounded-xl border-2 transition-all ${
                   selected?.id === s.id
-                    ? 'border-rose-500 bg-rose-50'
-                    : 'border-gray-200 bg-white hover:border-rose-300 hover:shadow-sm'
+                    ? 'border-brand-500 bg-brand-50'
+                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -47,7 +47,7 @@ export default function Step1Service({ selected, onSelect }: Props) {
                     {s.description && <p className="text-sm text-gray-500 mt-0.5">{s.description}</p>}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-bold text-rose-600">{s.price.toLocaleString('ru-RU')} ₽</p>
+                    <p className="font-bold text-brand-600">{s.price.toLocaleString('ru-RU')} ₽</p>
                     <p className="text-xs text-gray-400">{s.durationMinutes} мин</p>
                   </div>
                 </div>

@@ -1,11 +1,12 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Calendar, Clock, Images, LogOut, Sparkles } from 'lucide-react'
 import { useAuthStore } from '../../store/auth.store'
 import { useSiteConfig } from '../../hooks/useSiteConfig'
 
 const nav = [
-  { to: '/master/calendar', label: 'Мой календарь', icon: '📅' },
-  { to: '/master/hours', label: 'График работы', icon: '🕐' },
-  { to: '/master/portfolio', label: 'Портфолио', icon: '📷' },
+  { to: '/master/calendar', label: 'Мой календарь', Icon: Calendar },
+  { to: '/master/hours', label: 'График работы', Icon: Clock },
+  { to: '/master/portfolio', label: 'Портфолио', Icon: Images },
 ]
 
 export default function MasterLayout() {
@@ -18,7 +19,9 @@ export default function MasterLayout() {
   const logo = site.logoUrl ? (
     <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-xl object-cover shrink-0" />
   ) : (
-    <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold shrink-0">💅</div>
+    <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white shrink-0">
+      <Sparkles className="w-5 h-5" />
+    </div>
   )
 
   return (
@@ -35,13 +38,13 @@ export default function MasterLayout() {
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-1">
-          {nav.map(({ to, label, icon }) => (
+          {nav.map(({ to, label, Icon }) => (
             <NavLink key={to} to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-rose-50 text-rose-600' : 'text-gray-600 hover:bg-gray-100'}`
+                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${isActive ? 'bg-brand-50 text-brand-600' : 'text-gray-600 hover:bg-gray-100'}`
               }
             >
-              <span>{icon}</span>{label}
+              <Icon className="w-4 h-4" />{label}
             </NavLink>
           ))}
         </nav>
@@ -50,7 +53,9 @@ export default function MasterLayout() {
             <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
             <p className="text-xs text-gray-400">Мастер</p>
           </div>
-          <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 p-1.5">⎋</button>
+          <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 p-1.5" title="Выйти">
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
       </aside>
 
@@ -64,13 +69,13 @@ export default function MasterLayout() {
           <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 text-sm px-2 py-1">Выйти</button>
         </div>
         <nav className="flex gap-1 px-2 pb-2 overflow-x-auto">
-          {nav.map(({ to, label, icon }) => (
+          {nav.map(({ to, label, Icon }) => (
             <NavLink key={to} to={to}
               className={({ isActive }) =>
-                `flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${isActive ? 'bg-rose-50 text-rose-600' : 'text-gray-600'}`
+                `flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${isActive ? 'bg-brand-50 text-brand-600' : 'text-gray-600'}`
               }
             >
-              <span>{icon}</span>{label}
+              <Icon className="w-4 h-4" />{label}
             </NavLink>
           ))}
         </nav>

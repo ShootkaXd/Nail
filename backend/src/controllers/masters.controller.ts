@@ -9,7 +9,7 @@ export async function listMasters(req: Request, res: Response) {
       id: true, name: true, login: true, email: true, phone: true,
       masterProfile: {
         select: {
-          id: true, bio: true, address: true,
+          id: true, bio: true, address: true, avatarUrl: true,
           masterServices: { select: { serviceId: true, customPrice: true } },
         },
       },
@@ -78,9 +78,9 @@ export async function updateMaster(req: Request, res: Response) {
 export async function getMyProfile(req: Request, res: Response) {
   const profile = await prisma.masterProfile.findUnique({
     where: { userId: req.user!.id },
-    select: { bio: true, address: true },
+    select: { bio: true, address: true, avatarUrl: true },
   })
-  res.json(profile ?? { bio: null, address: null })
+  res.json(profile ?? { bio: null, address: null, avatarUrl: null })
 }
 
 // Master updates own profile (bio + address)

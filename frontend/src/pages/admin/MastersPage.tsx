@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { MapPin, Plus } from 'lucide-react'
 import { mastersApi, servicesApi } from '../../api/admin'
 import type { Master, Service, WorkingHour } from '../../types'
 import Button from '../../components/ui/Button'
 import Modal from '../../components/ui/Modal'
 import Input from '../../components/ui/Input'
+import Avatar from '../../components/ui/Avatar'
 import { useForm } from 'react-hook-form'
 
 const DAYS = ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
@@ -41,9 +43,9 @@ function WorkingHoursEditor({ masterId, onClose }: { masterId: number; onClose: 
   return (
     <div className="space-y-3">
       {hours.map((h, i) => (
-        <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${h.isActive ? 'border-rose-200 bg-rose-50' : 'border-gray-200 bg-gray-50'}`}>
+        <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${h.isActive ? 'border-brand-200 bg-brand-50' : 'border-gray-200 bg-gray-50'}`}>
           <label className="flex items-center gap-2 w-36 cursor-pointer">
-            <input type="checkbox" checked={h.isActive} onChange={e => update(i, { isActive: e.target.checked })} className="accent-rose-500" />
+            <input type="checkbox" checked={h.isActive} onChange={e => update(i, { isActive: e.target.checked })} className="accent-brand-500" />
             <span className={`text-sm font-medium ${h.isActive ? 'text-gray-800' : 'text-gray-400'}`}>{DAYS[h.dayOfWeek]}</span>
           </label>
           {h.isActive && (
@@ -97,7 +99,7 @@ function MasterFormComponent({ master, services, onSave, onCancel }: { master?: 
       <Input label="Телефон" {...register('phone')} />
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-gray-700">О мастере</label>
-        <textarea {...register('bio')} rows={2} className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none" />
+        <textarea {...register('bio')} rows={2} className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none" />
       </div>
       <Input label="Адрес приёма" {...register('address')} placeholder="г. Москва, ул. Ленина 10, салон «Роза»" />
       {!master && <Input label="Пароль *" type="password" {...register('password', { required: true })} placeholder="Минимум 6 символов" error={errors.password ? 'Обязательное поле' : ''} />}
@@ -106,8 +108,8 @@ function MasterFormComponent({ master, services, onSave, onCancel }: { master?: 
         <label className="text-sm font-medium text-gray-700 block mb-2">Услуги мастера</label>
         <div className="grid grid-cols-2 gap-2">
           {services.filter(s => s.isActive).map(s => (
-            <label key={s.id} className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${selectedServices.includes(s.id) ? 'border-rose-300 bg-rose-50' : 'border-gray-200 hover:border-gray-300'}`}>
-              <input type="checkbox" checked={selectedServices.includes(s.id)} onChange={() => toggleService(s.id)} className="accent-rose-500" />
+            <label key={s.id} className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${selectedServices.includes(s.id) ? 'border-brand-300 bg-brand-50' : 'border-gray-200 hover:border-gray-300'}`}>
+              <input type="checkbox" checked={selectedServices.includes(s.id)} onChange={() => toggleService(s.id)} className="accent-brand-500" />
               <span className="text-sm text-gray-700">{s.name}</span>
             </label>
           ))}
@@ -141,23 +143,27 @@ export default function MastersPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Мастера</h1>
-        <Button onClick={() => setEditing('new')}>+ Добавить мастера</Button>
+        <Button onClick={() => setEditing('new')}>
+          <Plus className="w-4 h-4" /> Добавить мастера
+        </Button>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {masters.map(m => (
           <div key={m.id} className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white text-xl font-bold">
-                {m.name.charAt(0)}
-              </div>
+              <Avatar name={m.name} url={m.masterProfile?.avatarUrl} size={48} />
               <div>
                 <p className="font-bold text-gray-900">{m.name}</p>
                 {m.phone && <p className="text-xs text-gray-400">{m.phone}</p>}
               </div>
             </div>
             {m.masterProfile?.bio && <p className="text-sm text-gray-500 mb-3 line-clamp-2">{m.masterProfile.bio}</p>}
-            {m.masterProfile?.address && <p className="text-xs text-gray-500 mb-3">📍 {m.masterProfile.address}</p>}
+            {m.masterProfile?.address && (
+              <p className="text-xs text-gray-500 mb-3 flex items-center gap-1">
+                <MapPin className="w-3 h-3 shrink-0" /> {m.masterProfile.address}
+              </p>
+            )}
             <p className="text-xs text-gray-400 mb-3">
               Услуг: {m.masterProfile?.masterServices.length ?? 0}
             </p>

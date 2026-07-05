@@ -81,7 +81,7 @@ export default function MasterBookingForm({ onDone, onCancel }: { onDone: () => 
                 const t = new Date(s).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
                 return (
                   <button key={s} type="button" onClick={() => setSlot(s)}
-                    className={`py-2 rounded-lg text-sm border-2 transition ${slot === s ? 'border-rose-500 bg-rose-500 text-white' : 'border-gray-200 hover:border-rose-400'}`}>
+                    className={`py-2 rounded-lg text-sm border-2 transition ${slot === s ? 'border-brand-500 bg-brand-500 text-white' : 'border-gray-200 hover:border-brand-400'}`}>
                     {t}
                   </button>
                 )
@@ -98,7 +98,7 @@ export default function MasterBookingForm({ onDone, onCancel }: { onDone: () => 
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">Заметки</label>
           <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={2}
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none" />
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none" />
         </div>
       </div>
 

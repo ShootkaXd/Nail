@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowLeft, Calendar, Clock, Sparkles } from 'lucide-react'
 import { publicApi } from '../api/public'
 import { useSeason } from '../hooks/useSeason'
 import { useSiteConfig } from '../hooks/useSiteConfig'
@@ -65,12 +66,14 @@ export default function MyBookingsPage() {
             {site.logoUrl ? (
               <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-xl object-cover shrink-0" />
             ) : (
-              <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0">💅</div>
+              <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
             )}
             <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">Мои записи</h1>
           </div>
-          <Link to="/" className="text-xs sm:text-sm text-rose-500 hover:text-rose-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100 shrink-0">
-            ← К записи
+          <Link to="/" className="text-xs sm:text-sm text-brand-500 hover:text-brand-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100 shrink-0 inline-flex items-center gap-1">
+            <ArrowLeft className="w-3.5 h-3.5" /> К записи
           </Link>
         </div>
       </header>
@@ -100,8 +103,12 @@ export default function MyBookingsPage() {
                     <Badge status={a.status} />
                   </div>
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 mb-3">
-                    <span>📅 {new Date(a.startAt).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
-                    <span>🕐 {new Date(a.startAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4 shrink-0" /> {new Date(a.startAt).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-4 h-4 shrink-0" /> {new Date(a.startAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                     <span className="font-semibold text-gray-900">{a.totalPrice.toLocaleString('ru-RU')} ₽</span>
                   </div>
                   {a.notes && <p className="text-xs text-gray-400 mb-3">Пожелания: {a.notes}</p>}

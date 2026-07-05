@@ -1,9 +1,12 @@
+import type { LucideIcon } from 'lucide-react'
+import { Snowflake, Flower2, Sun, Leaf } from 'lucide-react'
+
 export type Season = 'winter' | 'spring' | 'summer' | 'autumn'
 
 export interface SeasonTheme {
   season: Season
   label: string
-  emoji: string
+  Icon: LucideIcon
   // Tailwind gradient classes for page background
   gradient: string
   // Header accent
@@ -15,7 +18,7 @@ const THEMES: Record<Season, SeasonTheme> = {
   winter: {
     season: 'winter',
     label: 'Зима',
-    emoji: '❄️',
+    Icon: Snowflake,
     gradient: 'from-sky-50 via-white to-blue-50',
     headerBorder: 'border-sky-100',
     badge: 'bg-sky-100 text-sky-700',
@@ -23,7 +26,7 @@ const THEMES: Record<Season, SeasonTheme> = {
   spring: {
     season: 'spring',
     label: 'Весна',
-    emoji: '🌸',
+    Icon: Flower2,
     gradient: 'from-pink-50 via-white to-green-50',
     headerBorder: 'border-pink-100',
     badge: 'bg-pink-100 text-pink-700',
@@ -31,7 +34,7 @@ const THEMES: Record<Season, SeasonTheme> = {
   summer: {
     season: 'summer',
     label: 'Лето',
-    emoji: '☀️',
+    Icon: Sun,
     gradient: 'from-amber-50 via-white to-rose-50',
     headerBorder: 'border-amber-100',
     badge: 'bg-amber-100 text-amber-700',
@@ -39,7 +42,7 @@ const THEMES: Record<Season, SeasonTheme> = {
   autumn: {
     season: 'autumn',
     label: 'Осень',
-    emoji: '🍂',
+    Icon: Leaf,
     gradient: 'from-orange-50 via-white to-yellow-50',
     headerBorder: 'border-orange-100',
     badge: 'bg-orange-100 text-orange-700',

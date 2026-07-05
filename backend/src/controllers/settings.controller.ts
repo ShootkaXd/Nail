@@ -118,6 +118,69 @@ export async function uploadLogo(req: Request, res: Response) {
   res.json(merged)
 }
 
+// ---------- Theme settings (primary color, font) ----------
+
+const THEME_KEY = 'theme_settings'
+
+export const ALLOWED_FONTS = [
+  'Manrope', 'Inter', 'Nunito Sans', 'Montserrat', 'Marcellus', 'Cormorant Garamond', 'Playfair Display', 'Jost',
+] as const
+
+export interface ThemeConfig {
+  primaryColor: string
+  fontFamily: string
+}
+
+export const defaultTheme: ThemeConfig = {
+  primaryColor: '#A06F50',
+  fontFamily: 'Manrope',
+}
+
+const HEX_RE = /^#[0-9a-fA-F]{6}$/
+
+export async function getTheme(): Promise<ThemeConfig> {
+  const row = await prisma.setting.findUnique({ where: { key: THEME_KEY } })
+  if (!row) return defaultTheme
+  try {
+    const parsed = JSON.parse(row.value)
+    return {
+      primaryColor: HEX_RE.test(parsed.primaryColor) ? parsed.primaryColor : defaultTheme.primaryColor,
+      fontFamily: ALLOWED_FONTS.includes(parsed.fontFamily) ? parsed.fontFamily : defaultTheme.fontFamily,
+    }
+  } catch {
+    return defaultTheme
+  }
+}
+
+// Public: theme config for runtime CSS variable injection
+export async function getThemePublic(_req: Request, res: Response) {
+  res.json(await getTheme())
+}
+
+// Admin: update theme config
+export async function updateTheme(req: Request, res: Response) {
+  const { primaryColor, fontFamily } = req.body as Partial<ThemeConfig>
+
+  if (primaryColor !== undefined && !HEX_RE.test(String(primaryColor))) {
+    return res.status(400).json({ error: 'Цвет должен быть в формате #RRGGBB' })
+  }
+  if (fontFamily !== undefined && !ALLOWED_FONTS.includes(fontFamily as (typeof ALLOWED_FONTS)[number])) {
+    return res.status(400).json({ error: 'Недопустимый шрифт' })
+  }
+
+  const current = await getTheme()
+  const merged: ThemeConfig = {
+    primaryColor: primaryColor ?? current.primaryColor,
+    fontFamily: fontFamily ?? current.fontFamily,
+  }
+  await prisma.setting.upsert({
+    where: { key: THEME_KEY },
+    update: { value: JSON.stringify(merged) },
+    create: { key: THEME_KEY, value: JSON.stringify(merged) },
+  })
+  res.json(merged)
+}
+
 // Admin: update form config
 export async function updateBookingForm(req: Request, res: Response) {
   const incoming = req.body as Partial<BookingFormConfig>

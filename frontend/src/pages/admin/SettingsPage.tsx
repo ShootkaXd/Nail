@@ -1,12 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
+import { Check, Sparkles } from 'lucide-react'
 import { publicApi } from '../../api/public'
 import { settingsApi, systemApi } from '../../api/admin'
 import { invalidateSiteConfig } from '../../hooks/useSiteConfig'
+import { previewTheme } from '../../hooks/useTheme'
+import { ALL_SEASONS } from '../../hooks/useSeason'
 import type { BookingFormConfig, SiteConfig } from '../../types'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 
 const FIELD_LABELS: Record<string, string> = { name: 'Имя', phone: 'Телефон', email: 'Email', notes: 'Пожелания' }
+
+const FONT_OPTIONS = ['Manrope', 'Inter', 'Nunito Sans', 'Montserrat', 'Marcellus', 'Cormorant Garamond', 'Playfair Display', 'Jost']
 
 export default function SettingsPage() {
   const [config, setConfig] = useState<BookingFormConfig | null>(null)
@@ -25,9 +30,15 @@ export default function SettingsPage() {
   const [logoUploading, setLogoUploading] = useState(false)
   const logoRef = useRef<HTMLInputElement>(null)
 
+  // Theme (color + font)
+  const [theme, setTheme] = useState({ primaryColor: '#A06F50', fontFamily: 'Manrope' })
+  const [savingTheme, setSavingTheme] = useState(false)
+  const [themeSaved, setThemeSaved] = useState(false)
+
   useEffect(() => {
     publicApi.getFormConfig().then(setConfig)
     publicApi.getSiteConfig().then(setSite).catch(() => {})
+    publicApi.getTheme().then(setTheme).catch(() => {})
     systemApi.version().then(setVersion).catch(() => {})
   }, [])
 
@@ -67,6 +78,20 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2000)
   }
 
+  const updateThemeField = (patch: Partial<typeof theme>) => {
+    const next = { ...theme, ...patch }
+    setTheme(next)
+    previewTheme(next) // live preview across the whole admin UI as you edit
+  }
+
+  const saveTheme = async () => {
+    setSavingTheme(true)
+    await settingsApi.updateTheme(theme)
+    setSavingTheme(false)
+    setThemeSaved(true)
+    setTimeout(() => setThemeSaved(false), 2000)
+  }
+
   const checkUpdates = async () => {
     setCheckingUpdate(true)
     try { setUpdateInfo(await systemApi.checkUpdates()) }
@@ -92,7 +117,9 @@ export default function SettingsPage() {
               {site.logoUrl ? (
                 <img src={site.logoUrl} alt="Логотип" className="w-14 h-14 rounded-xl object-cover border border-gray-200" />
               ) : (
-                <div className="w-14 h-14 bg-rose-500 rounded-xl flex items-center justify-center text-white text-2xl">💅</div>
+                <div className="w-14 h-14 bg-brand-500 rounded-xl flex items-center justify-center text-white">
+                  <Sparkles className="w-6 h-6" />
+                </div>
               )}
               <div>
                 <input ref={logoRef} type="file" accept="image/*" onChange={onLogoFile} className="hidden" />
@@ -135,11 +162,63 @@ export default function SettingsPage() {
 
             <div className="flex items-center gap-3">
               <Button onClick={saveSite} loading={savingSite}>Сохранить</Button>
-              {siteSaved && <span className="text-sm text-green-600">✓ Сохранено</span>}
+              {siteSaved && <span className="text-sm text-green-600 flex items-center gap-1"><Check className="w-4 h-4" /> Сохранено</span>}
             </div>
           </div>
         </section>
       )}
+
+      {/* Colors & fonts */}
+      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <h2 className="font-semibold text-gray-900 mb-1">Оформление: цвет и шрифт</h2>
+        <p className="text-sm text-gray-500 mb-4">Основной цвет сайта (кнопки, ссылки, акценты) и шрифт текста.</p>
+
+        <div className="flex flex-wrap items-end gap-4 mb-4">
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1">Основной цвет</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                value={theme.primaryColor}
+                onChange={e => updateThemeField({ primaryColor: e.target.value })}
+                className="w-12 h-10 rounded-lg border border-gray-300 cursor-pointer"
+              />
+              <Input
+                value={theme.primaryColor}
+                onChange={e => updateThemeField({ primaryColor: e.target.value })}
+                className="w-28 font-mono"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium text-gray-700 block mb-1">Шрифт</label>
+            <select
+              value={theme.fontFamily}
+              onChange={e => updateThemeField({ fontFamily: e.target.value })}
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm h-10"
+              style={{ fontFamily: theme.fontFamily }}
+            >
+              {FONT_OPTIONS.map(f => <option key={f} value={f} style={{ fontFamily: f }}>{f}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl border border-gray-200 bg-gray-50 mb-4" style={{ fontFamily: theme.fontFamily }}>
+          <p className="text-xs text-gray-400 mb-2">Предпросмотр</p>
+          <div className="flex items-center gap-3">
+            <button type="button" className="px-4 py-2 rounded-lg text-white text-sm font-medium" style={{ backgroundColor: theme.primaryColor }}>
+              Записаться
+            </button>
+            <span className="text-sm" style={{ color: theme.primaryColor }}>Ссылка примера</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button onClick={saveTheme} loading={savingTheme}>Сохранить оформление</Button>
+          {themeSaved && <span className="text-sm text-green-600 flex items-center gap-1"><Check className="w-4 h-4" /> Сохранено</span>}
+        </div>
+      </section>
 
       {/* Booking form */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
@@ -165,12 +244,12 @@ export default function SettingsPage() {
                     <label className="flex items-center gap-1 text-xs text-gray-600">
                       <input type="checkbox" checked={f.enabled} disabled={locked}
                         onChange={e => setConfig({ ...config, fields: { ...fields, [key]: { ...f, enabled: e.target.checked } } })}
-                        className="accent-rose-500" /> Показывать
+                        className="accent-brand-500" /> Показывать
                     </label>
                     <label className="flex items-center gap-1 text-xs text-gray-600">
                       <input type="checkbox" checked={f.required} disabled={locked}
                         onChange={e => setConfig({ ...config, fields: { ...fields, [key]: { ...f, required: e.target.checked } } })}
-                        className="accent-rose-500" /> Обязательно
+                        className="accent-brand-500" /> Обязательно
                     </label>
                   </div>
                 )
@@ -181,7 +260,7 @@ export default function SettingsPage() {
 
           <div className="flex items-center gap-3">
             <Button onClick={save} loading={saving}>Сохранить форму</Button>
-            {saved && <span className="text-sm text-green-600">✓ Сохранено</span>}
+            {saved && <span className="text-sm text-green-600 flex items-center gap-1"><Check className="w-4 h-4" /> Сохранено</span>}
           </div>
         </div>
       </section>
@@ -191,16 +270,14 @@ export default function SettingsPage() {
         <h2 className="font-semibold text-gray-900 mb-1">Оформление по временам года</h2>
         <p className="text-sm text-gray-500 mb-4">Тема оформления страницы записи. «Авто» — определяется по текущей дате.</p>
         <div className="flex flex-wrap gap-2">
-          {[
-            { key: 'auto', label: '🔄 Авто' },
-            { key: 'winter', label: '❄️ Зима' },
-            { key: 'spring', label: '🌸 Весна' },
-            { key: 'summer', label: '☀️ Лето' },
-            { key: 'autumn', label: '🍂 Осень' },
-          ].map(opt => (
-            <button key={opt.key} onClick={() => { localStorage.setItem('season', opt.key); setSeason(opt.key) }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium border transition ${season === opt.key ? 'bg-rose-500 text-white border-rose-500' : 'border-gray-300 text-gray-700 hover:border-rose-300'}`}>
-              {opt.label}
+          <button onClick={() => { localStorage.setItem('season', 'auto'); setSeason('auto') }}
+            className={`px-4 py-2 rounded-lg text-sm font-medium border transition ${season === 'auto' ? 'bg-brand-500 text-white border-brand-500' : 'border-gray-300 text-gray-700 hover:border-brand-300'}`}>
+            Авто
+          </button>
+          {Object.values(ALL_SEASONS).map(s => (
+            <button key={s.season} onClick={() => { localStorage.setItem('season', s.season); setSeason(s.season) }}
+              className={`px-4 py-2 rounded-lg text-sm font-medium border transition flex items-center gap-1.5 ${season === s.season ? 'bg-brand-500 text-white border-brand-500' : 'border-gray-300 text-gray-700 hover:border-brand-300'}`}>
+              <s.Icon className="w-4 h-4" /> {s.label}
             </button>
           ))}
         </div>

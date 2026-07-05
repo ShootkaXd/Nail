@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Settings } from 'lucide-react'
 import { authApi } from '../api/admin'
 import { useAuthStore } from '../store/auth.store'
 import Input from '../components/ui/Input'
@@ -47,10 +48,12 @@ export default function SetupPage() {
   if (checking) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-rose-500 rounded-2xl flex items-center justify-center text-white text-3xl mx-auto mb-4">⚙️</div>
+          <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4">
+            <Settings className="w-8 h-8" />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900">Настройка системы</h1>
           <p className="text-gray-500 text-sm mt-1">Создайте учётную запись администратора</p>
         </div>

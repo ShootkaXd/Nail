@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Check } from 'lucide-react'
 import { masterApi } from '../../api/admin'
 import type { WorkingHour } from '../../types'
 import Button from '../../components/ui/Button'
@@ -43,9 +44,9 @@ export default function WorkingHoursPage() {
 
       <div className="space-y-3">
         {hours.map((h, i) => (
-          <div key={i} className={`flex items-center gap-3 p-4 rounded-xl border transition ${h.isActive ? 'border-rose-200 bg-rose-50' : 'border-gray-200 bg-gray-50'}`}>
+          <div key={i} className={`flex items-center gap-3 p-4 rounded-xl border transition ${h.isActive ? 'border-brand-200 bg-brand-50' : 'border-gray-200 bg-gray-50'}`}>
             <label className="flex items-center gap-3 cursor-pointer flex-1">
-              <input type="checkbox" checked={h.isActive} onChange={e => update(i, { isActive: e.target.checked })} className="w-4 h-4 accent-rose-500" />
+              <input type="checkbox" checked={h.isActive} onChange={e => update(i, { isActive: e.target.checked })} className="w-4 h-4 accent-brand-500" />
               <span className={`font-medium w-28 ${h.isActive ? 'text-gray-800' : 'text-gray-400'}`}>{DAYS[h.dayOfWeek]}</span>
             </label>
             {h.isActive ? (
@@ -65,7 +66,7 @@ export default function WorkingHoursPage() {
 
       <div className="mt-6 flex items-center gap-3">
         <Button onClick={save} loading={saving} size="lg">Сохранить график</Button>
-        {saved && <span className="text-sm text-green-600 font-medium">✓ Сохранено</span>}
+        {saved && <span className="text-sm text-green-600 font-medium flex items-center gap-1"><Check className="w-4 h-4" /> Сохранено</span>}
       </div>
     </div>
   )

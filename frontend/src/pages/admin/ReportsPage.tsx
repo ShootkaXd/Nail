@@ -56,7 +56,7 @@ export default function ReportsPage() {
             {STATUS_PRESETS.map(p => <option key={p.key} value={p.key}>{p.label}</option>)}
           </select>
         </div>
-        <button onClick={setThisMonth} className="text-sm text-rose-600 hover:text-rose-700 px-3 py-2">Текущий месяц</button>
+        <button onClick={setThisMonth} className="text-sm text-brand-600 hover:text-brand-700 px-3 py-2">Текущий месяц</button>
         <button onClick={() => setFilters({ from: '', to: '', statuses: 'completed,confirmed' })} className="text-sm text-gray-500 hover:text-gray-700 px-3 py-2">Сбросить</button>
       </div>
 
@@ -64,8 +64,8 @@ export default function ReportsPage() {
         <>
           {/* Summary cards */}
           <div className="grid sm:grid-cols-2 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl p-6 text-white">
-              <p className="text-rose-100 text-sm">Общий заработок</p>
+            <div className="bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl p-6 text-white">
+              <p className="text-brand-100 text-sm">Общий заработок</p>
               <p className="text-3xl font-bold mt-1">{money(report.total)}</p>
             </div>
             <div className="bg-white rounded-2xl border border-gray-200 p-6">

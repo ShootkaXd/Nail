@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import { Camera, Check, X } from 'lucide-react'
 import { masterApi } from '../../api/admin'
 import type { MasterPhoto } from '../../types'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
+import Avatar from '../../components/ui/Avatar'
+import { useAuthStore } from '../../store/auth.store'
 
 export default function PortfolioPage() {
   const [photos, setPhotos] = useState<MasterPhoto[]>([])
@@ -35,13 +38,16 @@ export default function PortfolioPage() {
     load()
   }
 
-  // Own profile (bio + address)
-  const [profile, setProfile] = useState({ bio: '', address: '' })
+  // Own profile (bio + address + avatar)
+  const { user } = useAuthStore()
+  const [profile, setProfile] = useState({ bio: '', address: '', avatarUrl: null as string | null })
   const [savingProfile, setSavingProfile] = useState(false)
   const [profileSaved, setProfileSaved] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const avatarRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    masterApi.getProfile().then(p => setProfile({ bio: p.bio ?? '', address: p.address ?? '' })).catch(() => {})
+    masterApi.getProfile().then(p => setProfile({ bio: p.bio ?? '', address: p.address ?? '', avatarUrl: p.avatarUrl ?? null })).catch(() => {})
   }, [])
 
   const saveProfile = async () => {
@@ -52,6 +58,19 @@ export default function PortfolioPage() {
     setTimeout(() => setProfileSaved(false), 2000)
   }
 
+  const onAvatarFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarUploading(true)
+    try {
+      const { avatarUrl } = await masterApi.uploadAvatar(file)
+      setProfile(p => ({ ...p, avatarUrl }))
+    } finally {
+      setAvatarUploading(false)
+      if (avatarRef.current) avatarRef.current.value = ''
+    }
+  }
+
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Моё портфолио</h1>
@@ -60,16 +79,25 @@ export default function PortfolioPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 max-w-lg">
         <h2 className="font-semibold text-gray-900 mb-3">Мой профиль</h2>
         <div className="space-y-3">
+          <div className="flex items-center gap-4">
+            <Avatar name={user?.name ?? '?'} url={profile.avatarUrl} size={64} />
+            <div>
+              <input ref={avatarRef} type="file" accept="image/*" onChange={onAvatarFile} className="hidden" />
+              <Button variant="secondary" size="sm" onClick={() => avatarRef.current?.click()} loading={avatarUploading}>
+                <Camera className="w-4 h-4" /> Загрузить фото профиля
+              </Button>
+            </div>
+          </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">О себе</label>
             <textarea value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} rows={2}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none" />
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none" />
           </div>
           <Input label="Адрес приёма" value={profile.address} onChange={e => setProfile(p => ({ ...p, address: e.target.value }))}
             placeholder="г. Москва, ул. Ленина 10, салон «Роза»" />
           <div className="flex items-center gap-3">
             <Button onClick={saveProfile} loading={savingProfile}>Сохранить профиль</Button>
-            {profileSaved && <span className="text-sm text-green-600">✓ Сохранено</span>}
+            {profileSaved && <span className="text-sm text-green-600 flex items-center gap-1"><Check className="w-4 h-4" /> Сохранено</span>}
           </div>
           <p className="text-xs text-gray-400">Адрес виден клиентам при выборе мастера и в подтверждении записи.</p>
         </div>
@@ -79,7 +107,9 @@ export default function PortfolioPage() {
         <Input label="Подпись к фото (необязательно)" value={caption} onChange={e => setCaption(e.target.value)} placeholder="Например: Гель-лак, френч" />
         <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
         <div className="mt-4">
-          <Button onClick={() => fileRef.current?.click()} loading={uploading}>📷 Загрузить фото</Button>
+          <Button onClick={() => fileRef.current?.click()} loading={uploading}>
+            <Camera className="w-4 h-4" /> Загрузить фото
+          </Button>
           <p className="text-xs text-gray-400 mt-2">JPG, PNG, WEBP или GIF, до 5 МБ</p>
         </div>
         {error && <p className="text-sm text-red-500 mt-3">{error}</p>}
@@ -95,7 +125,7 @@ export default function PortfolioPage() {
               {p.caption && <span className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-xs px-2 py-1 truncate">{p.caption}</span>}
               <button onClick={() => del(p.id)}
                 className="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
           ))}

@@ -12,6 +12,7 @@ export interface MasterProfile {
   id: number
   bio: string | null
   address?: string | null
+  avatarUrl?: string | null
   masterServices: Array<{ serviceId: number; customPrice: number | null }>
 }
 
@@ -81,6 +82,7 @@ export interface GalleryMaster {
     id: number
     bio: string | null
     address?: string | null
+    avatarUrl?: string | null
     photos: MasterPhoto[]
     masterServices: Array<{ service: { id: number; name: string; category: string } }>
   } | null

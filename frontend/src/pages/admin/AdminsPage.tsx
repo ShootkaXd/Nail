@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Check, Plus } from 'lucide-react'
 import { adminsApi, accountApi } from '../../api/admin'
 import { useAuthStore } from '../../store/auth.store'
 import Button from '../../components/ui/Button'
@@ -19,6 +20,7 @@ export default function AdminsPage() {
   const [pwOpen, setPwOpen] = useState(false)
   const [pw, setPw] = useState({ current: '', next: '', confirm: '' })
   const [pwMsg, setPwMsg] = useState('')
+  const [pwSuccess, setPwSuccess] = useState(false)
 
   const load = () => adminsApi.list().then(setAdmins)
   useEffect(() => { load() }, [])
@@ -48,10 +50,12 @@ export default function AdminsPage() {
   const changePw = async (e: React.FormEvent) => {
     e.preventDefault()
     setPwMsg('')
+    setPwSuccess(false)
     if (pw.next !== pw.confirm) return setPwMsg('Пароли не совпадают')
     try {
       await accountApi.changePassword(pw.current, pw.next)
-      setPwMsg('✓ Пароль изменён')
+      setPwMsg('Пароль изменён')
+      setPwSuccess(true)
       setPw({ current: '', next: '', confirm: '' })
       setTimeout(() => setPwOpen(false), 1200)
     } catch (e: unknown) {
@@ -65,7 +69,9 @@ export default function AdminsPage() {
         <h1 className="text-2xl font-bold text-gray-900">Администраторы</h1>
         <div className="flex gap-2">
           <Button variant="secondary" onClick={() => setPwOpen(true)}>Сменить мой пароль</Button>
-          <Button onClick={() => setCreating(true)}>+ Добавить администратора</Button>
+          <Button onClick={() => setCreating(true)}>
+            <Plus className="w-4 h-4" /> Добавить администратора
+          </Button>
         </div>
       </div>
 
@@ -83,7 +89,7 @@ export default function AdminsPage() {
             {admins.map(a => (
               <tr key={a.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 font-medium text-gray-900">
-                  {a.name} {a.id === user?.id && <span className="text-xs text-rose-500">(вы)</span>}
+                  {a.name} {a.id === user?.id && <span className="text-xs text-brand-500">(вы)</span>}
                 </td>
                 <td className="px-4 py-3 text-gray-600">{a.login}</td>
                 <td className="px-4 py-3 text-gray-500">{a.email ?? '—'}</td>
@@ -117,7 +123,11 @@ export default function AdminsPage() {
           <Input label="Текущий пароль" type="password" value={pw.current} onChange={e => setPw(p => ({ ...p, current: e.target.value }))} required />
           <Input label="Новый пароль" type="password" value={pw.next} onChange={e => setPw(p => ({ ...p, next: e.target.value }))} placeholder="Минимум 8 символов, буквы и цифры" required />
           <Input label="Повторите новый пароль" type="password" value={pw.confirm} onChange={e => setPw(p => ({ ...p, confirm: e.target.value }))} required />
-          {pwMsg && <p className={`text-sm px-3 py-2 rounded-lg ${pwMsg.startsWith('✓') ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'}`}>{pwMsg}</p>}
+          {pwMsg && (
+            <p className={`text-sm px-3 py-2 rounded-lg flex items-center gap-1.5 ${pwSuccess ? 'text-green-600 bg-green-50' : 'text-red-500 bg-red-50'}`}>
+              {pwSuccess && <Check className="w-4 h-4 shrink-0" />} {pwMsg}
+            </p>
+          )}
           <div className="flex gap-3">
             <Button variant="secondary" type="button" onClick={() => setPwOpen(false)}>Отмена</Button>
             <Button type="submit">Сохранить</Button>

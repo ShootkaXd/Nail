@@ -5,18 +5,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        rose: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          200: '#fecdd3',
-          300: '#fda4af',
-          400: '#fb7185',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          800: '#9f1239',
-          900: '#881337',
+        // Driven by CSS variables set at runtime from admin theme settings
+        // (see src/lib/theme.ts) — defaults live in src/index.css.
+        brand: {
+          50: 'var(--brand-50)',
+          100: 'var(--brand-100)',
+          200: 'var(--brand-200)',
+          300: 'var(--brand-300)',
+          400: 'var(--brand-400)',
+          500: 'var(--brand-500)',
+          600: 'var(--brand-600)',
+          700: 'var(--brand-700)',
+          800: 'var(--brand-800)',
+          900: 'var(--brand-900)',
         },
+      },
+      fontFamily: {
+        theme: ['var(--font-body)', 'system-ui', 'sans-serif'],
       },
     },
   },

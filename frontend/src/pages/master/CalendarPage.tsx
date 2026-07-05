@@ -100,7 +100,7 @@ export default function CalendarPage() {
               <div className="flex flex-wrap gap-2">
                 {STATUSES.map(s => (
                   <button key={s} onClick={() => changeStatus(selected.id, s)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${selected.status === s ? 'bg-rose-500 text-white border-rose-500' : 'border-gray-300 text-gray-600 hover:border-rose-300'}`}>
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition ${selected.status === s ? 'bg-brand-500 text-white border-brand-500' : 'border-gray-300 text-gray-600 hover:border-brand-300'}`}>
                     {STATUS_LABELS[s]}
                   </button>
                 ))}

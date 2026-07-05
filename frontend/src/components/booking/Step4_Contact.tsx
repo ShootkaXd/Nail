@@ -1,5 +1,6 @@
 import { Controller, useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Input from '../ui/Input'
 import PhoneInput from '../ui/PhoneInput'
 import Button from '../ui/Button'
@@ -35,7 +36,9 @@ export default function Step4Contact({ contact, formConfig, onSubmit, onBack }: 
 
   return (
     <div>
-      <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4">← Назад</button>
+      <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1">
+        <ArrowLeft className="w-4 h-4" /> Назад
+      </button>
       <h2 className="text-2xl font-bold text-gray-900 mb-1">Ваши контакты</h2>
       <p className="text-gray-500 mb-6">Укажите данные для подтверждения записи</p>
 
@@ -86,7 +89,7 @@ export default function Step4Contact({ contact, formConfig, onSubmit, onBack }: 
               {...register('notes', { required: notesField.required ? 'Заполните поле' : false })}
               placeholder="Любые пожелания или уточнения..."
               rows={3}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-100 resize-none"
+              className="rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100 resize-none"
             />
             {errors.notes?.message && <p className="text-xs text-red-500">{errors.notes.message}</p>}
           </div>
@@ -98,11 +101,11 @@ export default function Step4Contact({ contact, formConfig, onSubmit, onBack }: 
             <input
               type="checkbox"
               {...register('consent', { required: 'Необходимо согласие на обработку персональных данных' })}
-              className="mt-0.5 accent-rose-500"
+              className="mt-0.5 accent-brand-500"
             />
             <span className="text-xs text-gray-500 leading-relaxed">
               Я даю согласие на обработку моих персональных данных в соответствии с{' '}
-              <Link to="/privacy" target="_blank" className="text-rose-500 underline underline-offset-2">
+              <Link to="/privacy" target="_blank" className="text-brand-500 underline underline-offset-2">
                 политикой обработки персональных данных
               </Link>{' '}
               (152-ФЗ) *
@@ -112,8 +115,12 @@ export default function Step4Contact({ contact, formConfig, onSubmit, onBack }: 
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button variant="secondary" type="button" onClick={onBack}>← Назад</Button>
-          <Button type="submit">Далее →</Button>
+          <Button variant="secondary" type="button" onClick={onBack}>
+            <ArrowLeft className="w-4 h-4" /> Назад
+          </Button>
+          <Button type="submit">
+            Далее <ArrowRight className="w-4 h-4" />
+          </Button>
         </div>
       </form>
     </div>

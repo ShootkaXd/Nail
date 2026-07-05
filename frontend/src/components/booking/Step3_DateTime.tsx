@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { ArrowLeft, ChevronLeft, ChevronRight, MapPin, Percent } from 'lucide-react'
 import { publicApi } from '../../api/public'
 import type { Master, PriceInfo, Service } from '../../types'
 import Spinner from '../ui/Spinner'
@@ -66,7 +67,9 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
 
   return (
     <div>
-      <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4">← Назад</button>
+      <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1">
+        <ArrowLeft className="w-4 h-4" /> Назад
+      </button>
       <h2 className="text-2xl font-bold text-gray-900 mb-1">Выберите дату и время</h2>
       <p className="text-gray-500 mb-6">Мастер: <span className="font-medium text-gray-700">{master.name}</span></p>
 
@@ -80,7 +83,7 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
                 return { year: d.getFullYear(), month: d.getMonth() }
               })}
               className="p-2 hover:bg-gray-100 rounded-lg"
-            >←</button>
+            ><ChevronLeft className="w-4 h-4" /></button>
             <span className="font-semibold">{MONTHS[currentMonth.month]} {currentMonth.year}</span>
             <button
               onClick={() => setCurrentMonth(m => {
@@ -88,7 +91,7 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
                 return { year: d.getFullYear(), month: d.getMonth() }
               })}
               className="p-2 hover:bg-gray-100 rounded-lg"
-            >→</button>
+            ><ChevronRight className="w-4 h-4" /></button>
           </div>
           <div className="grid grid-cols-7 gap-1 mb-2">
             {WEEKDAYS.map(d => <div key={d} className="text-center text-xs font-medium text-gray-400 py-1">{d}</div>)}
@@ -106,9 +109,9 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
                   disabled={isPast || isFuture}
                   onClick={() => setDate(ds)}
                   className={`aspect-square rounded-lg text-sm font-medium transition-colors ${
-                    isSelected ? 'bg-rose-500 text-white' :
+                    isSelected ? 'bg-brand-500 text-white' :
                     isPast || isFuture ? 'text-gray-300 cursor-not-allowed' :
-                    'hover:bg-rose-50 text-gray-700'
+                    'hover:bg-brand-50 text-gray-700'
                   }`}
                 >
                   {d.getDate()}
@@ -136,8 +139,8 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
                     onClick={() => priceInfo && onSelect(slot, date, priceInfo)}
                     className={`py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
                       isSelected
-                        ? 'border-rose-500 bg-rose-500 text-white'
-                        : 'border-gray-200 bg-white hover:border-rose-400 text-gray-700'
+                        ? 'border-brand-500 bg-brand-500 text-white'
+                        : 'border-gray-200 bg-white hover:border-brand-400 text-gray-700'
                     }`}
                   >
                     {time}
@@ -148,25 +151,29 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
           )}
 
           {priceInfo && (
-            <div className="mt-4 p-4 bg-rose-50 rounded-xl border border-rose-100">
+            <div className="mt-4 p-4 bg-brand-50 rounded-xl border border-brand-100">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Стоимость</span>
                 <div className="text-right">
                   {priceInfo.discountPercent > 0 && (
                     <p className="text-sm text-gray-400 line-through">{priceInfo.basePrice.toLocaleString('ru-RU')} ₽</p>
                   )}
-                  <p className="font-bold text-rose-600 text-lg">{priceInfo.finalPrice.toLocaleString('ru-RU')} ₽</p>
+                  <p className="font-bold text-brand-600 text-lg">{priceInfo.finalPrice.toLocaleString('ru-RU')} ₽</p>
                 </div>
               </div>
               {priceInfo.promotionName && (
-                <p className="text-xs text-rose-500 mt-1">🎉 Акция: {priceInfo.promotionName} (-{priceInfo.discountPercent}%)</p>
+                <p className="text-xs text-brand-500 mt-1 flex items-center gap-1">
+                  <Percent className="w-3.5 h-3.5 shrink-0" /> Акция: {priceInfo.promotionName} (-{priceInfo.discountPercent}%)
+                </p>
               )}
             </div>
           )}
 
           {master.masterProfile?.address && (
             <div className="mt-4">
-              <p className="text-sm text-gray-500 mb-2">📍 {master.masterProfile.address}</p>
+              <p className="text-sm text-gray-500 mb-2 flex items-center gap-1">
+                <MapPin className="w-4 h-4 shrink-0" /> {master.masterProfile.address}
+              </p>
               <MapEmbed address={master.masterProfile.address} height={180} />
             </div>
           )}
@@ -174,7 +181,9 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
       </div>
 
       <div className="mt-6">
-        <Button variant="secondary" onClick={onBack}>← Назад</Button>
+        <Button variant="secondary" onClick={onBack}>
+          <ArrowLeft className="w-4 h-4" /> Назад
+        </Button>
       </div>
     </div>
   )

@@ -39,6 +39,7 @@ model MasterProfile {
   userId         Int             @unique
   bio            String?
   address        String?
+  avatarUrl      String?
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   masterServices MasterService[]
   photos         MasterPhoto[]

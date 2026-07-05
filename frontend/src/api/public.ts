@@ -12,6 +12,7 @@ export const publicApi = {
   getFormConfig: () => api.get<BookingFormConfig>('/public/form-config').then(r => r.data),
   getMastersGallery: () => api.get<GalleryMaster[]>('/public/masters-gallery').then(r => r.data),
   getSiteConfig: () => api.get<SiteConfig>('/public/site-config').then(r => r.data),
+  getTheme: () => api.get<{ primaryColor: string; fontFamily: string }>('/public/theme').then(r => r.data),
   createAppointment: (data: {
     clientName: string
     clientPhone: string

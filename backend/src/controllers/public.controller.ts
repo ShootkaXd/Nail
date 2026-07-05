@@ -35,6 +35,7 @@ export async function getMasters(req: Request, res: Response) {
           id: true,
           bio: true,
           address: true,
+          avatarUrl: true,
           masterServices: {
             where: serviceId ? { serviceId: Number(serviceId) } : undefined,
             select: { customPrice: true, serviceId: true },
@@ -59,6 +60,7 @@ export async function getMastersGallery(_req: Request, res: Response) {
           id: true,
           bio: true,
           address: true,
+          avatarUrl: true,
           photos: { select: { id: true, url: true, caption: true }, orderBy: { createdAt: 'desc' } },
           masterServices: { select: { service: { select: { id: true, name: true, category: true } } } },
         },

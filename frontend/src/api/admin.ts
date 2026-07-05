@@ -51,9 +51,14 @@ export const masterApi = {
     return api.post<MasterPhoto>('/master/photos', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
   },
   deletePhoto: (id: number) => api.delete(`/master/photos/${id}`),
-  getProfile: () => api.get<{ bio: string | null; address: string | null }>('/master/profile').then(r => r.data),
+  getProfile: () => api.get<{ bio: string | null; address: string | null; avatarUrl: string | null }>('/master/profile').then(r => r.data),
   updateProfile: (data: { bio?: string; address?: string }) =>
-    api.put<{ bio: string | null; address: string | null }>('/master/profile', data).then(r => r.data),
+    api.put<{ bio: string | null; address: string | null; avatarUrl: string | null }>('/master/profile', data).then(r => r.data),
+  uploadAvatar: (file: File) => {
+    const fd = new FormData()
+    fd.append('avatar', file)
+    return api.post<{ avatarUrl: string }>('/master/avatar', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
+  },
 }
 
 export interface EarningsReport {
@@ -84,6 +89,8 @@ export const settingsApi = {
     fd.append('logo', file)
     return api.post('/settings/logo', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
   },
+  updateTheme: (theme: { primaryColor: string; fontFamily: string }) =>
+    api.put<{ primaryColor: string; fontFamily: string }>('/settings/theme', theme).then(r => r.data),
 }
 
 export const systemApi = {
