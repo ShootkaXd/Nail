@@ -3,6 +3,7 @@ import { publicApi } from '../../api/public'
 import type { Master, PriceInfo, Service } from '../../types'
 import Spinner from '../ui/Spinner'
 import Button from '../ui/Button'
+import MapEmbed from '../ui/MapEmbed'
 
 interface Props {
   service: Service
@@ -160,6 +161,13 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
               {priceInfo.promotionName && (
                 <p className="text-xs text-rose-500 mt-1">🎉 Акция: {priceInfo.promotionName} (-{priceInfo.discountPercent}%)</p>
               )}
+            </div>
+          )}
+
+          {master.masterProfile?.address && (
+            <div className="mt-4">
+              <p className="text-sm text-gray-500 mb-2">📍 {master.masterProfile.address}</p>
+              <MapEmbed address={master.masterProfile.address} height={180} />
             </div>
           )}
         </div>

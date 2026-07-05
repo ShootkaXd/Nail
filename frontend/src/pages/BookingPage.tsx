@@ -12,6 +12,7 @@ import { useSiteConfig } from '../hooks/useSiteConfig'
 import SeasonalEffects from '../components/SeasonalEffects'
 import PublicFooter from '../components/PublicFooter'
 import CookieNotice from '../components/CookieNotice'
+import MapEmbed from '../components/ui/MapEmbed'
 import type { Service, Master, PriceInfo, BookingFormConfig } from '../types'
 
 export interface BookingState {
@@ -113,11 +114,20 @@ export default function BookingPage() {
           />
         )}
         {step === 6 && (
-          <div className="text-center py-16">
+          <div className="text-center py-12">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">✅</div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Запись создана!</h2>
             <p className="text-gray-500 mb-1">Номер записи: <strong>#{booking.appointmentId}</strong></p>
             <p className="text-gray-500 mb-6">Мы свяжемся с вами для подтверждения</p>
+
+            {booking.master?.masterProfile?.address && (
+              <div className="max-w-md mx-auto mb-8 text-left">
+                <p className="text-sm font-medium text-gray-700 mb-2">📍 Куда идти:</p>
+                <p className="text-sm text-gray-500 mb-3">{booking.master.masterProfile.address}</p>
+                <MapEmbed address={booking.master.masterProfile.address} height={240} />
+              </div>
+            )}
+
             <button
               onClick={() => { setStep(1); setBooking({ service: null, master: null, slot: null, date: null, contact: null, priceInfo: null, appointmentId: null }) }}
               className="bg-rose-500 hover:bg-rose-600 text-white px-8 py-3 rounded-xl font-medium transition-colors"
