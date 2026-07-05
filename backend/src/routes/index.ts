@@ -16,6 +16,7 @@ import { listAdmins, createAdmin, deleteAdmin, changePassword } from '../control
 import { getBookingFormPublic, updateBookingForm, getSitePublic, updateSite, uploadLogo, getThemePublic, updateTheme } from '../controllers/settings.controller'
 import { logoUploadMiddleware, avatarUploadMiddleware } from '../controllers/photos.controller'
 import { versionInfo, checkUpdates } from '../controllers/system.controller'
+import { setupTwoFactor, enableTwoFactor, disableTwoFactor, verifyTwoFactorLogin } from '../controllers/twoFactor.controller'
 
 const router = Router()
 
@@ -38,6 +39,12 @@ router.put('/public/appointments/:id/cancel', myBookingsLimiter, cancelMyAppoint
 router.post('/auth/login', authLimiter, validateBody(loginSchema), login)
 router.get('/auth/me', authenticate, me)
 router.post('/auth/change-password', authenticate, changePassword)
+
+// Two-factor authentication (TOTP)
+router.post('/auth/2fa/setup', authenticate, authLimiter, setupTwoFactor)
+router.post('/auth/2fa/enable', authenticate, authLimiter, enableTwoFactor)
+router.post('/auth/2fa/disable', authenticate, authLimiter, disableTwoFactor)
+router.post('/auth/2fa/verify', authLimiter, verifyTwoFactorLogin)
 
 // Admin — services
 router.get('/services', authenticate, requireRole('admin'), listServices)

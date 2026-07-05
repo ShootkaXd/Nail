@@ -103,11 +103,28 @@ export const accountApi = {
     api.post('/auth/change-password', { currentPassword, newPassword }).then(r => r.data),
 }
 
+export interface LoginResult {
+  token?: string
+  user?: { id: number; name: string; email: string; role: string }
+  requires2FA?: boolean
+  preAuthToken?: string
+}
+
 export const authApi = {
   setupStatus: () => api.get<{ needsSetup: boolean }>('/setup/status').then(r => r.data),
   setup: (data: { name: string; login: string; email?: string; password: string }) =>
     api.post<{ token: string; user: { id: number; name: string; email: string; role: string } }>('/setup', data).then(r => r.data),
   login: (login: string, password: string) =>
-    api.post<{ token: string; user: { id: number; name: string; email: string; role: string } }>('/auth/login', { login, password }).then(r => r.data),
+    api.post<LoginResult>('/auth/login', { login, password }).then(r => r.data),
   me: () => api.get('/auth/me').then(r => r.data),
+}
+
+export const twoFactorApi = {
+  setup: (password: string) =>
+    api.post<{ secret: string; qrDataUrl: string }>('/auth/2fa/setup', { password }).then(r => r.data),
+  enable: (code: string) => api.post<{ enabled: boolean }>('/auth/2fa/enable', { code }).then(r => r.data),
+  disable: (password: string, code: string) =>
+    api.post<{ enabled: boolean }>('/auth/2fa/disable', { password, code }).then(r => r.data),
+  verifyLogin: (preAuthToken: string, code: string) =>
+    api.post<{ token: string; user: { id: number; name: string; email: string; role: string } }>('/auth/2fa/verify', { preAuthToken, code }).then(r => r.data),
 }

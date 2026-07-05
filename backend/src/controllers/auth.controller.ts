@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import prisma from '../lib/prisma'
-import { env } from '../config/env'
+import { issueSessionToken, issuePreAuthToken } from '../lib/token'
 
 export async function login(req: Request, res: Response) {
   const { login: username, password } = req.body
@@ -15,19 +14,18 @@ export async function login(req: Request, res: Response) {
     return res.status(401).json({ error: 'Invalid credentials' })
   }
 
-  const token = jwt.sign(
-    { id: user.id, role: user.role, name: user.name },
-    env.JWT_SECRET,
-    { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
-  )
+  if (user.twoFactorEnabled) {
+    return res.json({ requires2FA: true, preAuthToken: issuePreAuthToken(user.id) })
+  }
 
+  const token = issueSessionToken(user)
   res.json({ token, user: { id: user.id, name: user.name, role: user.role, email: user.email } })
 }
 
 export async function me(req: Request, res: Response) {
   const user = await prisma.user.findUnique({
     where: { id: req.user!.id },
-    select: { id: true, name: true, email: true, phone: true, role: true },
+    select: { id: true, name: true, email: true, phone: true, role: true, twoFactorEnabled: true },
   })
   res.json(user)
 }

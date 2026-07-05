@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Check, Plus } from 'lucide-react'
-import { adminsApi, accountApi } from '../../api/admin'
+import { adminsApi, accountApi, authApi } from '../../api/admin'
 import { useAuthStore } from '../../store/auth.store'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
+import TwoFactorSettings from '../../components/TwoFactorSettings'
 
 interface Admin { id: number; name: string; login: string; email: string | null; createdAt: string }
 
@@ -22,8 +23,13 @@ export default function AdminsPage() {
   const [pwMsg, setPwMsg] = useState('')
   const [pwSuccess, setPwSuccess] = useState(false)
 
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
+
   const load = () => adminsApi.list().then(setAdmins)
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    authApi.me().then((me: unknown) => setTwoFactorEnabled(Boolean((me as { twoFactorEnabled?: boolean }).twoFactorEnabled)))
+  }, [])
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
@@ -73,6 +79,10 @@ export default function AdminsPage() {
             <Plus className="w-4 h-4" /> Добавить администратора
           </Button>
         </div>
+      </div>
+
+      <div className="max-w-3xl mb-6">
+        <TwoFactorSettings enabled={twoFactorEnabled} onChanged={setTwoFactorEnabled} />
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto max-w-3xl">

@@ -31,5 +31,32 @@ services:
     ports:
       - "${HTTP_PORT:-8080}:80"
 
+  # Reverse proxy with automatic Let's Encrypt HTTPS. Opt-in: only starts
+  # with `docker compose --profile https up -d`. Requires DOMAIN in .env
+  # pointing (via DNS A record) at this server, and ports 80/443 open.
+  caddy:
+    image: caddy:2-alpine
+    profiles: ["https"]
+    restart: unless-stopped
+    depends_on:
+      - frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      # Soft default (not ":?required") — compose validates every service's
+      # interpolations at parse time even when its profile isn't active, so
+      # a hard-required var here would break plain `docker compose up -d`
+      # for users who never opt into the https profile. If DOMAIN is unset
+      # and you do start this profile, Caddy will just fail to get a real
+      # cert for "localhost" — visible in `docker compose logs caddy`.
+      DOMAIN: "${DOMAIN:-localhost}"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
 volumes:
   db-data:
+  caddy-data:
+  caddy-config:

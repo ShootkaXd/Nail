@@ -1,8 +1,7 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import prisma from '../lib/prisma'
-import { env } from '../config/env'
+import { issueSessionToken } from '../lib/token'
 
 // Whether the system still needs an initial admin
 export async function setupStatus(_req: Request, res: Response) {
@@ -27,11 +26,7 @@ export async function setup(req: Request, res: Response) {
     data: { name, login, email: email || null, passwordHash, role: 'admin' },
   })
 
-  const token = jwt.sign(
-    { id: user.id, role: user.role, name: user.name },
-    env.JWT_SECRET,
-    { expiresIn: env.JWT_EXPIRES_IN as jwt.SignOptions['expiresIn'] }
-  )
+  const token = issueSessionToken(user)
 
   res.status(201).json({ token, user: { id: user.id, name: user.name, role: user.role, email: user.email } })
 }

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Camera, Check, X } from 'lucide-react'
-import { masterApi } from '../../api/admin'
+import { masterApi, authApi } from '../../api/admin'
 import type { MasterPhoto } from '../../types'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Avatar from '../../components/ui/Avatar'
+import TwoFactorSettings from '../../components/TwoFactorSettings'
 import { useAuthStore } from '../../store/auth.store'
 
 export default function PortfolioPage() {
@@ -14,8 +15,13 @@ export default function PortfolioPage() {
   const [error, setError] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(false)
+
   const load = () => masterApi.listPhotos().then(setPhotos)
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    authApi.me().then((me: unknown) => setTwoFactorEnabled(Boolean((me as { twoFactorEnabled?: boolean }).twoFactorEnabled)))
+  }, [])
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -101,6 +107,10 @@ export default function PortfolioPage() {
           </div>
           <p className="text-xs text-gray-400">Адрес виден клиентам при выборе мастера и в подтверждении записи.</p>
         </div>
+      </div>
+
+      <div className="max-w-lg mb-6">
+        <TwoFactorSettings enabled={twoFactorEnabled} onChanged={setTwoFactorEnabled} />
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 max-w-lg">
