@@ -14,6 +14,9 @@ export default function PublicFooter() {
           <Link to="/privacy" className="hover:text-gray-700 underline underline-offset-2">
             Политика обработки персональных данных
           </Link>
+          <Link to="/offer" className="hover:text-gray-700 underline underline-offset-2">
+            Публичная оферта
+          </Link>
           <Link to="/masters" className="hover:text-gray-700">Наши мастера</Link>
           <Link to="/my-bookings" className="hover:text-gray-700">Мои записи</Link>
         </div>

@@ -18,6 +18,7 @@ import PortfolioPage from './pages/master/PortfolioPage'
 import ReportsPage from './pages/admin/ReportsPage'
 import MastersGalleryPage from './pages/MastersGalleryPage'
 import PrivacyPage from './pages/PrivacyPage'
+import OfferPage from './pages/OfferPage'
 import MyBookingsPage from './pages/MyBookingsPage'
 
 function RequireRole({ role, children }: { role: string; children: React.ReactNode }) {
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/my-bookings" element={<MyBookingsPage />} />
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/offer" element={<OfferPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/admin" element={<RequireRole role="admin"><AdminLayout /></RequireRole>}>
