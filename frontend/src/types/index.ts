@@ -47,7 +47,7 @@ export interface Appointment {
   id: number
   clientName: string
   clientPhone: string
-  clientEmail: string
+  clientEmail: string | null
   masterId: number
   serviceId: number
   startAt: string
@@ -100,6 +100,19 @@ export interface BookingFormConfig {
     phone: FormFieldConfig
     email: FormFieldConfig
     notes: FormFieldConfig
+  }
+}
+
+export interface SiteConfig {
+  salonName: string
+  logoUrl: string | null
+  requisites: {
+    companyName: string
+    inn: string
+    ogrn: string
+    address: string
+    email: string
+    phone: string
   }
 }
 

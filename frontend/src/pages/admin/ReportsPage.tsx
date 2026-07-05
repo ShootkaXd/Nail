@@ -88,7 +88,7 @@ export default function ReportsPage() {
 
 function ReportTable({ title, rows, total }: { title: string; rows: Array<{ name: string; sub: string; count: number; total: number }>; total: number }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
       <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900">{title}</div>
       <table className="w-full text-sm">
         <thead className="bg-gray-50 border-b border-gray-200 text-gray-500">

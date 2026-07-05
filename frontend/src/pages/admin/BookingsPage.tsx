@@ -60,7 +60,7 @@ export default function BookingsPage() {
       </div>
 
       {loading ? <Spinner /> : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -117,7 +117,7 @@ export default function BookingsPage() {
           <div className="space-y-3 text-sm">
             <Row label="Клиент" value={detail.clientName} />
             <Row label="Телефон" value={detail.clientPhone} />
-            <Row label="Email" value={detail.clientEmail} />
+            <Row label="Email" value={detail.clientEmail ?? '—'} />
             <Row label="Услуга" value={detail.service.name} />
             <Row label="Мастер" value={detail.master.name} />
             <Row label="Дата" value={new Date(detail.startAt).toLocaleString('ru-RU')} />

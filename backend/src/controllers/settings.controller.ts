@@ -40,6 +40,84 @@ export async function getBookingFormPublic(_req: Request, res: Response) {
   res.json(await getBookingForm())
 }
 
+// ---------- Site settings (name, logo, legal requisites) ----------
+
+const SITE_KEY = 'site_settings'
+
+export interface SiteConfig {
+  salonName: string
+  logoUrl: string | null
+  requisites: {
+    companyName: string // ИП/ООО — оператор персональных данных
+    inn: string
+    ogrn: string
+    address: string
+    email: string
+    phone: string
+  }
+}
+
+export const defaultSite: SiteConfig = {
+  salonName: 'Nail Studio',
+  logoUrl: null,
+  requisites: { companyName: '', inn: '', ogrn: '', address: '', email: '', phone: '' },
+}
+
+export async function getSite(): Promise<SiteConfig> {
+  const row = await prisma.setting.findUnique({ where: { key: SITE_KEY } })
+  if (!row) return defaultSite
+  try {
+    const parsed = JSON.parse(row.value)
+    return { ...defaultSite, ...parsed, requisites: { ...defaultSite.requisites, ...parsed.requisites } }
+  } catch {
+    return defaultSite
+  }
+}
+
+// Public: site config for headers/footer/privacy page
+export async function getSitePublic(_req: Request, res: Response) {
+  res.json(await getSite())
+}
+
+// Admin: update site config
+export async function updateSite(req: Request, res: Response) {
+  const incoming = req.body as Partial<SiteConfig>
+  const current = await getSite()
+  const s = (v: unknown, fallback: string, max: number) =>
+    v === undefined ? fallback : String(v).slice(0, max)
+  const merged: SiteConfig = {
+    salonName: s(incoming.salonName, current.salonName, 120) || 'Nail Studio',
+    logoUrl: incoming.logoUrl === undefined ? current.logoUrl : (incoming.logoUrl ? String(incoming.logoUrl).slice(0, 300) : null),
+    requisites: {
+      companyName: s(incoming.requisites?.companyName, current.requisites.companyName, 240),
+      inn: s(incoming.requisites?.inn, current.requisites.inn, 20),
+      ogrn: s(incoming.requisites?.ogrn, current.requisites.ogrn, 20),
+      address: s(incoming.requisites?.address, current.requisites.address, 300),
+      email: s(incoming.requisites?.email, current.requisites.email, 160),
+      phone: s(incoming.requisites?.phone, current.requisites.phone, 32),
+    },
+  }
+  await prisma.setting.upsert({
+    where: { key: SITE_KEY },
+    update: { value: JSON.stringify(merged) },
+    create: { key: SITE_KEY, value: JSON.stringify(merged) },
+  })
+  res.json(merged)
+}
+
+// Admin: upload salon logo (multipart, field "logo")
+export async function uploadLogo(req: Request, res: Response) {
+  if (!req.file) return res.status(400).json({ error: 'Файл не загружен' })
+  const current = await getSite()
+  const merged: SiteConfig = { ...current, logoUrl: `/uploads/${req.file.filename}` }
+  await prisma.setting.upsert({
+    where: { key: SITE_KEY },
+    update: { value: JSON.stringify(merged) },
+    create: { key: SITE_KEY, value: JSON.stringify(merged) },
+  })
+  res.json(merged)
+}
+
 // Admin: update form config
 export async function updateBookingForm(req: Request, res: Response) {
   const incoming = req.body as Partial<BookingFormConfig>

@@ -8,6 +8,10 @@ import Step4Contact from '../components/booking/Step4_Contact'
 import Step5Confirm from '../components/booking/Step5_Confirm'
 import { publicApi } from '../api/public'
 import { useSeason } from '../hooks/useSeason'
+import { useSiteConfig } from '../hooks/useSiteConfig'
+import SeasonalEffects from '../components/SeasonalEffects'
+import PublicFooter from '../components/PublicFooter'
+import CookieNotice from '../components/CookieNotice'
 import type { Service, Master, PriceInfo, BookingFormConfig } from '../types'
 
 export interface BookingState {
@@ -34,26 +38,32 @@ export default function BookingPage() {
   const update = (patch: Partial<BookingState>) => setBooking(b => ({ ...b, ...patch }))
 
   const theme = useSeason()
+  const site = useSiteConfig()
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.gradient}`}>
+    <div className={`min-h-screen flex flex-col bg-gradient-to-br ${theme.gradient}`}>
+      <SeasonalEffects season={theme.season} />
       <header className={`bg-white/80 backdrop-blur shadow-sm border-b ${theme.headerBorder}`}>
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">💅</div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">{formConfig?.title ?? 'Nail Studio'}</h1>
-              <p className="text-xs text-gray-500">{formConfig?.subtitle ?? 'Онлайн запись на услуги'}</p>
+        <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            {site.logoUrl ? (
+              <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+            ) : (
+              <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0">💅</div>
+            )}
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">{site.salonName}</h1>
+              <p className="text-xs text-gray-500 truncate">{formConfig?.subtitle ?? 'Онлайн запись на услуги'}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className={`hidden sm:inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full ${theme.badge}`}>
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+            <span className={`hidden md:inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full ${theme.badge}`}>
               {theme.emoji} {theme.label}
             </span>
-            <Link to="/masters" className="text-sm text-gray-500 hover:text-gray-700 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
-              Наши мастера
+            <Link to="/masters" className="text-xs sm:text-sm text-gray-500 hover:text-gray-700 transition-colors px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100">
+              Мастера
             </Link>
-            <Link to="/login" className="text-sm text-gray-400 hover:text-gray-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-gray-100">
+            <Link to="/login" className="text-xs sm:text-sm text-gray-400 hover:text-gray-600 transition-colors px-2 sm:px-3 py-1.5 rounded-lg hover:bg-gray-100">
               Вход
             </Link>
           </div>
@@ -117,6 +127,9 @@ export default function BookingPage() {
           </div>
         )}
       </main>
+      <div className="flex-1" />
+      <PublicFooter />
+      <CookieNotice />
     </div>
   )
 }

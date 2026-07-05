@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { publicApi } from '../../api/public'
 import { settingsApi, systemApi } from '../../api/admin'
-import type { BookingFormConfig } from '../../types'
+import { invalidateSiteConfig } from '../../hooks/useSiteConfig'
+import type { BookingFormConfig, SiteConfig } from '../../types'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 
@@ -17,10 +18,45 @@ export default function SettingsPage() {
   const [checkingUpdate, setCheckingUpdate] = useState(false)
   const [season, setSeason] = useState(() => localStorage.getItem('season') || 'auto')
 
+  // Site config (salon name, logo, legal requisites)
+  const [site, setSite] = useState<SiteConfig | null>(null)
+  const [savingSite, setSavingSite] = useState(false)
+  const [siteSaved, setSiteSaved] = useState(false)
+  const [logoUploading, setLogoUploading] = useState(false)
+  const logoRef = useRef<HTMLInputElement>(null)
+
   useEffect(() => {
     publicApi.getFormConfig().then(setConfig)
+    publicApi.getSiteConfig().then(setSite).catch(() => {})
     systemApi.version().then(setVersion).catch(() => {})
   }, [])
+
+  const saveSite = async () => {
+    if (!site) return
+    setSavingSite(true)
+    await settingsApi.updateSite(site)
+    invalidateSiteConfig()
+    setSavingSite(false)
+    setSiteSaved(true)
+    setTimeout(() => setSiteSaved(false), 2000)
+  }
+
+  const onLogoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLogoUploading(true)
+    try {
+      const updated = await settingsApi.uploadLogo(file)
+      setSite(updated as SiteConfig)
+      invalidateSiteConfig()
+    } finally {
+      setLogoUploading(false)
+      if (logoRef.current) logoRef.current.value = ''
+    }
+  }
+
+  const setReq = (key: keyof SiteConfig['requisites'], value: string) =>
+    setSite(s => s ? { ...s, requisites: { ...s.requisites, [key]: value } } : s)
 
   const save = async () => {
     if (!config) return
@@ -46,6 +82,64 @@ export default function SettingsPage() {
   return (
     <div className="p-6 max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Настройки</h1>
+
+      {/* Salon identity & legal requisites */}
+      {site && (
+        <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="font-semibold text-gray-900 mb-4">Салон: название, логотип, реквизиты</h2>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              {site.logoUrl ? (
+                <img src={site.logoUrl} alt="Логотип" className="w-14 h-14 rounded-xl object-cover border border-gray-200" />
+              ) : (
+                <div className="w-14 h-14 bg-rose-500 rounded-xl flex items-center justify-center text-white text-2xl">💅</div>
+              )}
+              <div>
+                <input ref={logoRef} type="file" accept="image/*" onChange={onLogoFile} className="hidden" />
+                <div className="flex gap-2">
+                  <Button variant="secondary" size="sm" onClick={() => logoRef.current?.click()} loading={logoUploading}>
+                    Загрузить логотип
+                  </Button>
+                  {site.logoUrl && (
+                    <Button variant="ghost" size="sm" onClick={() => setSite(s => s ? { ...s, logoUrl: null } : s)}>
+                      Убрать
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">JPG/PNG/WEBP, до 5 МБ. Показывается в шапке сайта.</p>
+              </div>
+            </div>
+
+            <Input label="Название салона" value={site.salonName}
+              onChange={e => setSite(s => s ? { ...s, salonName: e.target.value } : s)} />
+
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-2">
+                Реквизиты (152-ФЗ): показываются в подвале сайта и политике обработки персональных данных
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <Input label="ИП / ООО (оператор ПДн)" placeholder="ИП Иванова Анна Петровна"
+                  value={site.requisites.companyName} onChange={e => setReq('companyName', e.target.value)} />
+                <Input label="ИНН" placeholder="123456789012"
+                  value={site.requisites.inn} onChange={e => setReq('inn', e.target.value)} />
+                <Input label="ОГРН / ОГРНИП" placeholder="312345678900012"
+                  value={site.requisites.ogrn} onChange={e => setReq('ogrn', e.target.value)} />
+                <Input label="Адрес" placeholder="г. Москва, ул. Ленина 10"
+                  value={site.requisites.address} onChange={e => setReq('address', e.target.value)} />
+                <Input label="E-mail для обращений" placeholder="salon@mail.ru"
+                  value={site.requisites.email} onChange={e => setReq('email', e.target.value)} />
+                <Input label="Телефон" placeholder="+7 (900) 123-45-67"
+                  value={site.requisites.phone} onChange={e => setReq('phone', e.target.value)} />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Button onClick={saveSite} loading={savingSite}>Сохранить</Button>
+              {siteSaved && <span className="text-sm text-green-600">✓ Сохранено</span>}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Booking form */}
       <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">

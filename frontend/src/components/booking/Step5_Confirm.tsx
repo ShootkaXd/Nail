@@ -32,6 +32,7 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
         serviceId: service.id,
         startAt: slot,
         notes: contact.notes || undefined,
+        consent: true, // подтверждено чекбоксом на шаге контактов
       })
       onConfirm(result.id)
     } catch (e: unknown) {

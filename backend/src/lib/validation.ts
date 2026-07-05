@@ -29,6 +29,8 @@ export const createAppointmentSchema = z.object({
   serviceId: z.coerce.number().int().positive(),
   startAt: z.string().datetime({ message: 'Неверная дата' }),
   notes: z.string().trim().max(1000).optional().or(z.literal('')),
+  // 152-ФЗ: согласие на обработку персональных данных обязательно
+  consent: z.literal(true, { errorMap: () => ({ message: 'Необходимо согласие на обработку персональных данных' }) }),
 })
 
 // Validate req.body against a schema; on failure return 400 with details

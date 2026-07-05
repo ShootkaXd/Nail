@@ -1,5 +1,5 @@
 import api from './client'
-import type { Service, Master, PriceInfo, BookingFormConfig, GalleryMaster } from '../types'
+import type { Service, Master, PriceInfo, BookingFormConfig, GalleryMaster, SiteConfig } from '../types'
 
 export const publicApi = {
   getServices: () => api.get<Service[]>('/public/services').then(r => r.data),
@@ -11,6 +11,7 @@ export const publicApi = {
     api.get<PriceInfo>('/public/price', { params: { serviceId, masterId } }).then(r => r.data),
   getFormConfig: () => api.get<BookingFormConfig>('/public/form-config').then(r => r.data),
   getMastersGallery: () => api.get<GalleryMaster[]>('/public/masters-gallery').then(r => r.data),
+  getSiteConfig: () => api.get<SiteConfig>('/public/site-config').then(r => r.data),
   createAppointment: (data: {
     clientName: string
     clientPhone: string
@@ -19,5 +20,6 @@ export const publicApi = {
     serviceId: number
     startAt: string
     notes?: string
+    consent: boolean
   }) => api.post('/public/appointments', data).then(r => r.data),
 }

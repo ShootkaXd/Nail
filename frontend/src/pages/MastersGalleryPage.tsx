@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { publicApi } from '../api/public'
 import { useSeason } from '../hooks/useSeason'
+import { useSiteConfig } from '../hooks/useSiteConfig'
+import SeasonalEffects from '../components/SeasonalEffects'
+import PublicFooter from '../components/PublicFooter'
 import type { GalleryMaster, MasterPhoto } from '../types'
 import Spinner from '../components/ui/Spinner'
 
@@ -10,18 +13,24 @@ export default function MastersGalleryPage() {
   const [loading, setLoading] = useState(true)
   const [lightbox, setLightbox] = useState<MasterPhoto | null>(null)
   const theme = useSeason()
+  const site = useSiteConfig()
 
   useEffect(() => {
     publicApi.getMastersGallery().then(setMasters).finally(() => setLoading(false))
   }, [])
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${theme.gradient}`}>
+    <div className={`min-h-screen flex flex-col bg-gradient-to-br ${theme.gradient}`}>
+      <SeasonalEffects season={theme.season} />
       <header className={`bg-white/80 backdrop-blur shadow-sm border-b ${theme.headerBorder}`}>
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">💅</div>
-            <h1 className="text-xl font-bold text-gray-900">Наши мастера</h1>
+          <div className="flex items-center gap-3 min-w-0">
+            {site.logoUrl ? (
+              <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+            ) : (
+              <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shrink-0">💅</div>
+            )}
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">Наши мастера</h1>
           </div>
           <Link to="/" className="bg-rose-500 hover:bg-rose-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
             Записаться
@@ -78,6 +87,8 @@ export default function MastersGalleryPage() {
           </div>
         )}
       </main>
+      <div className="flex-1" />
+      <PublicFooter />
 
       {lightbox && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>

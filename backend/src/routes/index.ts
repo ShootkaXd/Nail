@@ -13,7 +13,8 @@ import { earnings } from '../controllers/reports.controller'
 import { uploadMiddleware, uploadPhoto, listMyPhotos, deletePhoto } from '../controllers/photos.controller'
 import { setupStatus, setup } from '../controllers/setup.controller'
 import { listAdmins, createAdmin, deleteAdmin, changePassword } from '../controllers/admins.controller'
-import { getBookingFormPublic, updateBookingForm } from '../controllers/settings.controller'
+import { getBookingFormPublic, updateBookingForm, getSitePublic, updateSite, uploadLogo } from '../controllers/settings.controller'
+import { logoUploadMiddleware } from '../controllers/photos.controller'
 import { versionInfo, checkUpdates } from '../controllers/system.controller'
 
 const router = Router()
@@ -61,6 +62,11 @@ router.delete('/promotions/:id', authenticate, requireRole('admin'), deletePromo
 
 // Admin — booking form settings
 router.put('/settings/booking-form', authenticate, requireRole('admin'), updateBookingForm)
+
+// Site config (public read; admin write + logo upload)
+router.get('/public/site-config', getSitePublic)
+router.put('/settings/site', authenticate, requireRole('admin'), updateSite)
+router.post('/settings/logo', authenticate, requireRole('admin'), logoUploadMiddleware, uploadLogo)
 
 // Admin — system / updates
 router.get('/system/version', authenticate, requireRole('admin'), versionInfo)

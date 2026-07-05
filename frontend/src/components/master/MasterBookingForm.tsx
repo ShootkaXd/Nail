@@ -5,6 +5,7 @@ import { useAuthStore } from '../../store/auth.store'
 import type { Service } from '../../types'
 import Button from '../ui/Button'
 import Input from '../ui/Input'
+import PhoneInput from '../ui/PhoneInput'
 
 function toLocalDateStr(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -92,7 +93,7 @@ export default function MasterBookingForm({ onDone, onCancel }: { onDone: () => 
 
       <div className="border-t border-gray-100 pt-4 space-y-4">
         <Input label="Имя клиента *" value={form.clientName} onChange={e => setForm(f => ({ ...f, clientName: e.target.value }))} required />
-        <Input label="Телефон клиента *" value={form.clientPhone} onChange={e => setForm(f => ({ ...f, clientPhone: e.target.value }))} required />
+        <PhoneInput label="Телефон клиента *" value={form.clientPhone} onChange={v => setForm(f => ({ ...f, clientPhone: v }))} required />
         <Input label="Email (необязательно)" type="email" value={form.clientEmail} onChange={e => setForm(f => ({ ...f, clientEmail: e.target.value }))} />
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium text-gray-700">Заметки</label>

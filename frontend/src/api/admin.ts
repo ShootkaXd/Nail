@@ -78,6 +78,12 @@ export const adminsApi = {
 
 export const settingsApi = {
   updateBookingForm: (config: unknown) => api.put('/settings/booking-form', config).then(r => r.data),
+  updateSite: (config: unknown) => api.put('/settings/site', config).then(r => r.data),
+  uploadLogo: (file: File) => {
+    const fd = new FormData()
+    fd.append('logo', file)
+    return api.post('/settings/logo', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then(r => r.data)
+  },
 }
 
 export const systemApi = {

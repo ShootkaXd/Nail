@@ -18,14 +18,17 @@ const storage = multer.diskStorage({
 
 const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
-export const uploadMiddleware = multer({
+const imageUpload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (_req, file, cb) => {
     if (allowed.includes(file.mimetype)) cb(null, true)
     else cb(new Error('Разрешены только изображения (jpg, png, webp, gif)'))
   },
-}).single('photo')
+})
+
+export const uploadMiddleware = imageUpload.single('photo')
+export const logoUploadMiddleware = imageUpload.single('logo')
 
 async function resolveProfileId(userId: number, role: string, bodyMasterId?: unknown): Promise<number | null> {
   if (role === 'admin' && bodyMasterId) {
