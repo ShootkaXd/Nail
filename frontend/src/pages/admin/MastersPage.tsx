@@ -149,8 +149,8 @@ export default function MastersPage() {
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {masters.map(m => (
-          <div key={m.id} className="bg-white rounded-xl border border-gray-200 p-5">
+        {masters.map((m, i) => (
+          <div key={m.id} style={{ animationDelay: `${i * 50}ms` }} className="bg-white rounded-xl border border-gray-200 p-5 card-hover animate-fade-in-up opacity-0 [animation-fill-mode:forwards]">
             <div className="flex items-center gap-3 mb-3">
               <Avatar name={m.name} url={m.masterProfile?.avatarUrl} size={48} />
               <div>

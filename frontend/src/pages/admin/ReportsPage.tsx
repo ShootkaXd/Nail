@@ -64,11 +64,11 @@ export default function ReportsPage() {
         <>
           {/* Summary cards */}
           <div className="grid sm:grid-cols-2 gap-4 mb-8">
-            <div className="bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl p-6 text-white">
+            <div className="bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl p-6 text-white animate-fade-in-up">
               <p className="text-brand-100 text-sm">Общий заработок</p>
               <p className="text-3xl font-bold mt-1">{money(report.total)}</p>
             </div>
-            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 animate-fade-in-up [animation-delay:60ms]">
               <p className="text-gray-500 text-sm">Количество записей</p>
               <p className="text-3xl font-bold mt-1 text-gray-900">{report.count}</p>
               <p className="text-xs text-gray-400 mt-1">Средний чек: {money(report.count ? Math.round(report.total / report.count) : 0)}</p>
@@ -76,9 +76,9 @@ export default function ReportsPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-6">
-            <ReportTable title="По услугам" rows={report.byService.map(s => ({ name: s.name, sub: s.category, count: s.count, total: s.total }))} total={report.total} />
-            <ReportTable title="По мастерам" rows={report.byMaster.map(m => ({ name: m.name, sub: '', count: m.count, total: m.total }))} total={report.total} />
-            <ReportTable title="По категориям" rows={report.byCategory.map(c => ({ name: c.category, sub: '', count: c.count, total: c.total }))} total={report.total} />
+            <div className="animate-fade-in-up [animation-delay:120ms]"><ReportTable title="По услугам" rows={report.byService.map(s => ({ name: s.name, sub: s.category, count: s.count, total: s.total }))} total={report.total} /></div>
+            <div className="animate-fade-in-up [animation-delay:160ms]"><ReportTable title="По мастерам" rows={report.byMaster.map(m => ({ name: m.name, sub: '', count: m.count, total: m.total }))} total={report.total} /></div>
+            <div className="animate-fade-in-up [animation-delay:200ms]"><ReportTable title="По категориям" rows={report.byCategory.map(c => ({ name: c.category, sub: '', count: c.count, total: c.total }))} total={report.total} /></div>
           </div>
         </>
       )}

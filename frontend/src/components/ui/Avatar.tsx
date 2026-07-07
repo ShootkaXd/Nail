@@ -16,7 +16,7 @@ export default function Avatar({ name, url, size = 48, className = '' }: Props) 
         src={url}
         alt={name}
         style={style}
-        className={`rounded-full object-cover shrink-0 ${className}`}
+        className={`rounded-full object-cover shrink-0 transition-transform duration-300 hover:scale-105 ${className}`}
       />
     )
   }
@@ -24,7 +24,7 @@ export default function Avatar({ name, url, size = 48, className = '' }: Props) 
   return (
     <div
       style={{ ...style, fontSize: size * 0.4 }}
-      className={`rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-semibold shrink-0 ${className}`}
+      className={`rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-semibold shrink-0 transition-transform duration-300 hover:scale-105 ${className}`}
     >
       {name.charAt(0).toUpperCase()}
     </div>

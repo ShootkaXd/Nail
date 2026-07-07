@@ -35,16 +35,17 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
         <p className="text-center py-12 text-gray-400">Нет доступных мастеров для этой услуги</p>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
-          {masters.map(m => {
+          {masters.map((m, i) => {
             const customPrice = m.masterProfile?.masterServices.find(ms => ms.serviceId === service.id)?.customPrice
             return (
               <button
                 key={m.id}
                 onClick={() => onSelect(m)}
-                className={`text-left p-5 rounded-xl border-2 transition-all ${
+                style={{ animationDelay: `${i * 50}ms` }}
+                className={`text-left p-5 rounded-xl border-2 transition-all animate-fade-in-up opacity-0 [animation-fill-mode:forwards] ${
                   selected?.id === m.id
                     ? 'border-brand-500 bg-brand-50'
-                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm'
+                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm hover:-translate-y-0.5'
                 }`}
               >
                 <div className="flex items-center gap-4">

@@ -48,13 +48,18 @@ export default function AdminLayout() {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                  isActive ? 'bg-brand-50 text-brand-600' : 'text-gray-600 hover:bg-gray-100'
+                `relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isActive ? 'bg-brand-50 text-brand-600 translate-x-0.5' : 'text-gray-600 hover:bg-gray-100'
                 }`
               }
             >
-              <Icon className="w-4 h-4" />
-              {label}
+              {({ isActive }) => (
+                <>
+                  {isActive && <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-full bg-brand-500 animate-scale-in" />}
+                  <Icon className="w-4 h-4" />
+                  {label}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>

@@ -47,11 +47,11 @@ export default function MastersGalleryPage() {
           <p className="text-center text-gray-400 py-16">Мастера пока не добавлены</p>
         ) : (
           <div className="space-y-10">
-            {masters.map(m => {
+            {masters.map((m, i) => {
               const profile = m.masterProfile
               const categories = [...new Set(profile?.masterServices.map(ms => ms.service.category) ?? [])]
               return (
-                <section key={m.id} className="bg-white rounded-2xl border border-gray-200 p-6">
+                <section key={m.id} style={{ animationDelay: `${i * 60}ms` }} className="bg-white rounded-2xl border border-gray-200 p-6 animate-fade-in-up opacity-0 [animation-fill-mode:forwards]">
                   <div className="flex items-center gap-4 mb-4">
                     <Avatar name={m.name} url={profile?.avatarUrl} size={64} />
                     <div>
@@ -74,10 +74,11 @@ export default function MastersGalleryPage() {
 
                   {profile && profile.photos.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {profile.photos.map(p => (
+                      {profile.photos.map((p, pi) => (
                         <button key={p.id} onClick={() => setLightbox(p)}
-                          className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100">
-                          <img src={p.url} alt={p.caption ?? ''} className="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" />
+                          style={{ animationDelay: `${pi * 30}ms` }}
+                          className="group relative aspect-square rounded-xl overflow-hidden bg-gray-100 animate-fade-in-up opacity-0 [animation-fill-mode:forwards]">
+                          <img src={p.url} alt={p.caption ?? ''} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                           {p.caption && (
                             <span className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-xs px-2 py-1 truncate">{p.caption}</span>
                           )}
@@ -97,8 +98,8 @@ export default function MastersGalleryPage() {
       <PublicFooter />
 
       {lightbox && (
-        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
-          <div className="max-w-3xl max-h-[90vh]">
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 animate-fade-in" onClick={() => setLightbox(null)}>
+          <div className="max-w-3xl max-h-[90vh] animate-scale-in">
             <img src={lightbox.url} alt={lightbox.caption ?? ''} className="max-w-full max-h-[85vh] rounded-xl object-contain" />
             {lightbox.caption && <p className="text-center text-white/80 text-sm mt-3">{lightbox.caption}</p>}
           </div>

@@ -14,7 +14,7 @@ const labels: Record<string, string> = {
 
 export default function Badge({ status }: { status: string }) {
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[status] ?? 'bg-gray-100 text-gray-600'}`}>
+    <span key={status} className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium animate-pop-in transition-colors duration-300 ${colors[status] ?? 'bg-gray-100 text-gray-600'}`}>
       {labels[status] ?? status}
     </span>
   )

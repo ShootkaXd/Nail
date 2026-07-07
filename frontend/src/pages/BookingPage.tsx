@@ -14,6 +14,7 @@ import SeasonalEffects from '../components/SeasonalEffects'
 import PublicFooter from '../components/PublicFooter'
 import CookieNotice from '../components/CookieNotice'
 import MapEmbed from '../components/ui/MapEmbed'
+import ConfettiBurst from '../components/ConfettiBurst'
 import type { Service, Master, PriceInfo, BookingFormConfig } from '../types'
 
 export interface BookingState {
@@ -28,6 +29,7 @@ export interface BookingState {
 
 export default function BookingPage() {
   const [step, setStep] = useState(1)
+  const [direction, setDirection] = useState<'forward' | 'back'>('forward')
   const [booking, setBooking] = useState<BookingState>({
     service: null, master: null, slot: null, date: null,
     contact: null, priceInfo: null, appointmentId: null,
@@ -38,6 +40,12 @@ export default function BookingPage() {
   useEffect(() => { publicApi.getFormConfig().then(setFormConfig).catch(() => {}) }, [])
 
   const update = (patch: Partial<BookingState>) => setBooking(b => ({ ...b, ...patch }))
+
+  const goTo = (next: number) => {
+    setDirection(next > step ? 'forward' : 'back')
+    setStep(next)
+  }
+  const stepAnim = direction === 'forward' ? 'animate-slide-in-right' : 'animate-slide-in-left'
 
   const theme = useSeason()
   const site = useSiteConfig()
@@ -77,59 +85,70 @@ export default function BookingPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 py-8 overflow-x-hidden">
         {step < 6 && <StepIndicator current={step} />}
 
         {step === 1 && (
-          <Step1Service
-            onSelect={(service) => { update({ service, master: null, slot: null, date: null, priceInfo: null }); setStep(2) }}
-            selected={booking.service}
-          />
+          <div key={1} className={stepAnim}>
+            <Step1Service
+              onSelect={(service) => { update({ service, master: null, slot: null, date: null, priceInfo: null }); goTo(2) }}
+              selected={booking.service}
+            />
+          </div>
         )}
         {step === 2 && booking.service && (
-          <Step2Master
-            service={booking.service}
-            selected={booking.master}
-            onSelect={(master) => { update({ master, slot: null, date: null, priceInfo: null }); setStep(3) }}
-            onBack={() => setStep(1)}
-          />
+          <div key={2} className={stepAnim}>
+            <Step2Master
+              service={booking.service}
+              selected={booking.master}
+              onSelect={(master) => { update({ master, slot: null, date: null, priceInfo: null }); goTo(3) }}
+              onBack={() => goTo(1)}
+            />
+          </div>
         )}
         {step === 3 && booking.service && booking.master && (
-          <Step3DateTime
-            service={booking.service}
-            master={booking.master}
-            selectedSlot={booking.slot}
-            selectedDate={booking.date}
-            onSelect={(slot, date, priceInfo) => { update({ slot, date, priceInfo }); setStep(4) }}
-            onBack={() => setStep(2)}
-          />
+          <div key={3} className={stepAnim}>
+            <Step3DateTime
+              service={booking.service}
+              master={booking.master}
+              selectedSlot={booking.slot}
+              selectedDate={booking.date}
+              onSelect={(slot, date, priceInfo) => { update({ slot, date, priceInfo }); goTo(4) }}
+              onBack={() => goTo(2)}
+            />
+          </div>
         )}
         {step === 4 && (
-          <Step4Contact
-            contact={booking.contact}
-            formConfig={formConfig}
-            onSubmit={(contact) => { update({ contact }); setStep(5) }}
-            onBack={() => setStep(3)}
-          />
+          <div key={4} className={stepAnim}>
+            <Step4Contact
+              contact={booking.contact}
+              formConfig={formConfig}
+              onSubmit={(contact) => { update({ contact }); goTo(5) }}
+              onBack={() => goTo(3)}
+            />
+          </div>
         )}
         {step === 5 && booking.service && booking.master && booking.slot && booking.contact && (
-          <Step5Confirm
-            booking={booking}
-            onConfirm={(id) => { update({ appointmentId: id }); setStep(6) }}
-            onBack={() => setStep(4)}
-          />
+          <div key={5} className={stepAnim}>
+            <Step5Confirm
+              booking={booking}
+              onConfirm={(id) => { update({ appointmentId: id }); goTo(6) }}
+              onBack={() => goTo(4)}
+            />
+          </div>
         )}
         {step === 6 && (
-          <div className="text-center py-12">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="text-center py-12 animate-fade-in-up">
+            <ConfettiBurst />
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 animate-pop-in">
               <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Запись создана!</h2>
-            <p className="text-gray-500 mb-1">Номер записи: <strong>#{booking.appointmentId}</strong></p>
-            <p className="text-gray-500 mb-6">Мы свяжемся с вами для подтверждения</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 animate-fade-in-up [animation-delay:100ms]">Запись создана!</h2>
+            <p className="text-gray-500 mb-1 animate-fade-in-up [animation-delay:150ms]">Номер записи: <strong>#{booking.appointmentId}</strong></p>
+            <p className="text-gray-500 mb-6 animate-fade-in-up [animation-delay:200ms]">Мы свяжемся с вами для подтверждения</p>
 
             {booking.master?.masterProfile?.address && (
-              <div className="max-w-md mx-auto mb-8 text-left">
+              <div className="max-w-md mx-auto mb-8 text-left animate-fade-in-up [animation-delay:250ms]">
                 <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
                   <MapPin className="w-4 h-4 shrink-0" /> Куда идти:
                 </p>

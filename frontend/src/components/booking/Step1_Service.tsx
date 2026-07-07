@@ -31,14 +31,15 @@ export default function Step1Service({ selected, onSelect }: Props) {
         <div key={category} className="mb-8">
           <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">{category}</h3>
           <div className="grid sm:grid-cols-2 gap-3">
-            {items.map(s => (
+            {items.map((s, i) => (
               <button
                 key={s.id}
                 onClick={() => onSelect(s)}
-                className={`text-left p-4 rounded-xl border-2 transition-all ${
+                style={{ animationDelay: `${i * 40}ms` }}
+                className={`text-left p-4 rounded-xl border-2 transition-all animate-fade-in-up opacity-0 [animation-fill-mode:forwards] ${
                   selected?.id === s.id
                     ? 'border-brand-500 bg-brand-50'
-                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm'
+                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm hover:-translate-y-0.5'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
