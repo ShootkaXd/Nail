@@ -82,7 +82,7 @@ export default function BookingsPage() {
                     <p className="font-medium text-gray-900">{a.clientName}</p>
                     <p className="text-xs text-gray-400">{a.clientPhone}</p>
                   </td>
-                  <td className="px-4 py-3 text-gray-700">{a.service.name}</td>
+                  <td className="px-4 py-3 text-gray-700">{a.services.map(s => s.service.name).join(', ')}</td>
                   <td className="px-4 py-3 text-gray-700">{a.master.name}</td>
                   <td className="px-4 py-3 text-gray-600">
                     <p>{new Date(a.startAt).toLocaleDateString('ru-RU')}</p>
@@ -118,7 +118,7 @@ export default function BookingsPage() {
             <Row label="Клиент" value={detail.clientName} />
             <Row label="Телефон" value={detail.clientPhone} />
             <Row label="Email" value={detail.clientEmail ?? '—'} />
-            <Row label="Услуга" value={detail.service.name} />
+            <Row label={detail.services.length > 1 ? 'Услуги' : 'Услуга'} value={detail.services.map(s => s.service.name).join(', ')} />
             <Row label="Мастер" value={detail.master.name} />
             <Row label="Дата" value={new Date(detail.startAt).toLocaleString('ru-RU')} />
             <Row label="Стоимость" value={`${detail.totalPrice.toLocaleString('ru-RU')} ₽`} />

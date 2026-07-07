@@ -22,7 +22,7 @@ export async function earnings(req: Request, res: Response) {
     where,
     include: {
       master: { select: { id: true, name: true } },
-      service: { select: { id: true, name: true, category: true } },
+      services: { include: { service: { select: { id: true, name: true, category: true } } } },
     },
     orderBy: { startAt: 'desc' },
   })
@@ -38,14 +38,18 @@ export async function earnings(req: Request, res: Response) {
   const byCategoryMap = new Map<string, { category: string; count: number; total: number }>()
 
   for (const a of appointments) {
-    const s = byServiceMap.get(a.service.id) ?? { serviceId: a.service.id, name: a.service.name, category: a.service.category, count: 0, total: 0 }
-    s.count++; s.total += a.totalPrice; byServiceMap.set(a.service.id, s)
-
     const m = byMasterMap.get(a.master.id) ?? { masterId: a.master.id, name: a.master.name, count: 0, total: 0 }
     m.count++; m.total += a.totalPrice; byMasterMap.set(a.master.id, m)
 
-    const c = byCategoryMap.get(a.service.category) ?? { category: a.service.category, count: 0, total: 0 }
-    c.count++; c.total += a.totalPrice; byCategoryMap.set(a.service.category, c)
+    // A single booking can bundle several services — each line item is
+    // counted/totaled against its own service and category.
+    for (const line of a.services) {
+      const s = byServiceMap.get(line.service.id) ?? { serviceId: line.service.id, name: line.service.name, category: line.service.category, count: 0, total: 0 }
+      s.count++; s.total += line.price; byServiceMap.set(line.service.id, s)
+
+      const c = byCategoryMap.get(line.service.category) ?? { category: line.service.category, count: 0, total: 0 }
+      c.count++; c.total += line.price; byCategoryMap.set(line.service.category, c)
+    }
   }
 
   const round = (n: number) => Math.round(n * 100) / 100

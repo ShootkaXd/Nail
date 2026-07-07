@@ -3,12 +3,12 @@ import type { Service, Master, PriceInfo, BookingFormConfig, GalleryMaster, Site
 
 export const publicApi = {
   getServices: () => api.get<Service[]>('/public/services').then(r => r.data),
-  getMasters: (serviceId?: number) =>
-    api.get<Master[]>('/public/masters', { params: serviceId ? { serviceId } : {} }).then(r => r.data),
-  getSlots: (masterId: number, serviceId: number, date: string) =>
-    api.get<string[]>('/public/slots', { params: { masterId, serviceId, date } }).then(r => r.data),
-  getPrice: (serviceId: number, masterId: number) =>
-    api.get<PriceInfo>('/public/price', { params: { serviceId, masterId } }).then(r => r.data),
+  getMasters: (serviceIds?: number[]) =>
+    api.get<Master[]>('/public/masters', { params: serviceIds?.length ? { serviceIds: serviceIds.join(',') } : {} }).then(r => r.data),
+  getSlots: (masterId: number, serviceIds: number[], date: string) =>
+    api.get<string[]>('/public/slots', { params: { masterId, serviceIds: serviceIds.join(','), date } }).then(r => r.data),
+  getPrice: (serviceIds: number[], masterId: number) =>
+    api.get<PriceInfo>('/public/price', { params: { serviceIds: serviceIds.join(','), masterId } }).then(r => r.data),
   getFormConfig: () => api.get<BookingFormConfig>('/public/form-config').then(r => r.data),
   getMastersGallery: () => api.get<GalleryMaster[]>('/public/masters-gallery').then(r => r.data),
   getSiteConfig: () => api.get<SiteConfig>('/public/site-config').then(r => r.data),
@@ -18,7 +18,7 @@ export const publicApi = {
     clientPhone: string
     clientEmail?: string
     masterId: number
-    serviceId: number
+    serviceIds: number[]
     startAt: string
     notes?: string
     consent: boolean

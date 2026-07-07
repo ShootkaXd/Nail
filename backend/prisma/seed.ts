@@ -122,11 +122,11 @@ async function main() {
           clientPhoneDigits: normalizePhoneDigits(clientPhone),
           clientEmail: null,
           masterId: sm.masterId,
-          serviceId: sm.service.id,
           startAt: start,
           endAt: end,
           status: sm.status,
           totalPrice: sm.service.price,
+          services: { create: [{ serviceId: sm.service.id, price: sm.service.price }] },
         },
       })
     }

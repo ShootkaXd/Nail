@@ -18,7 +18,7 @@ import ConfettiBurst from '../components/ConfettiBurst'
 import type { Service, Master, PriceInfo, BookingFormConfig } from '../types'
 
 export interface BookingState {
-  service: Service | null
+  services: Service[]
   master: Master | null
   slot: string | null
   date: string | null
@@ -27,13 +27,15 @@ export interface BookingState {
   appointmentId: number | null
 }
 
+const emptyBooking: BookingState = {
+  services: [], master: null, slot: null, date: null,
+  contact: null, priceInfo: null, appointmentId: null,
+}
+
 export default function BookingPage() {
   const [step, setStep] = useState(1)
   const [direction, setDirection] = useState<'forward' | 'back'>('forward')
-  const [booking, setBooking] = useState<BookingState>({
-    service: null, master: null, slot: null, date: null,
-    contact: null, priceInfo: null, appointmentId: null,
-  })
+  const [booking, setBooking] = useState<BookingState>(emptyBooking)
 
   const [formConfig, setFormConfig] = useState<BookingFormConfig | null>(null)
 
@@ -93,25 +95,25 @@ export default function BookingPage() {
             {step === 1 && (
               <div key={1} className={stepAnim}>
                 <Step1Service
-                  onSelect={(service) => { update({ service, master: null, slot: null, date: null, priceInfo: null }); goTo(2) }}
-                  selected={booking.service}
+                  onContinue={(services) => { update({ services, master: null, slot: null, date: null, priceInfo: null }); goTo(2) }}
+                  selected={booking.services}
                 />
               </div>
             )}
-            {step === 2 && booking.service && (
+            {step === 2 && booking.services.length > 0 && (
               <div key={2} className={stepAnim}>
                 <Step2Master
-                  service={booking.service}
+                  services={booking.services}
                   selected={booking.master}
                   onSelect={(master) => { update({ master, slot: null, date: null, priceInfo: null }); goTo(3) }}
                   onBack={() => goTo(1)}
                 />
               </div>
             )}
-            {step === 3 && booking.service && booking.master && (
+            {step === 3 && booking.services.length > 0 && booking.master && (
               <div key={3} className={stepAnim}>
                 <Step3DateTime
-                  service={booking.service}
+                  services={booking.services}
                   master={booking.master}
                   selectedSlot={booking.slot}
                   selectedDate={booking.date}
@@ -130,7 +132,7 @@ export default function BookingPage() {
                 />
               </div>
             )}
-            {step === 5 && booking.service && booking.master && booking.slot && booking.contact && (
+            {step === 5 && booking.services.length > 0 && booking.master && booking.slot && booking.contact && (
               <div key={5} className={stepAnim}>
                 <Step5Confirm
                   booking={booking}
@@ -163,7 +165,7 @@ export default function BookingPage() {
             )}
 
             <button
-              onClick={() => { setStep(1); setBooking({ service: null, master: null, slot: null, date: null, contact: null, priceInfo: null, appointmentId: null }) }}
+              onClick={() => { setStep(1); setBooking(emptyBooking) }}
               className="bg-gradient-to-b from-brand-400 to-brand-600 hover:from-brand-500 hover:to-brand-600 text-white px-8 py-3.5 rounded-xl font-semibold shadow-md shadow-brand-500/25 hover:shadow-lg transition-all active:scale-[0.97]"
             >
               Записаться ещё раз

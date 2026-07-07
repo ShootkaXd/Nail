@@ -50,7 +50,6 @@ export interface Appointment {
   clientPhone: string
   clientEmail: string | null
   masterId: number
-  serviceId: number
   startAt: string
   endAt: string
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed'
@@ -58,14 +57,23 @@ export interface Appointment {
   totalPrice: number
   createdAt: string
   master: { id: number; name: string }
-  service: { id: number; name: string; category: string }
+  services: Array<{ id: number; price: number; service: { id: number; name: string; category: string } }>
 }
 
-export interface PriceInfo {
+export interface ServicePriceLine {
+  serviceId: number
+  name: string
   basePrice: number
   discountPercent: number
   finalPrice: number
   promotionName: string | null
+}
+
+export interface PriceInfo {
+  services: ServicePriceLine[]
+  totalBasePrice: number
+  totalFinalPrice: number
+  totalDurationMinutes: number
 }
 
 export interface MasterPhoto {

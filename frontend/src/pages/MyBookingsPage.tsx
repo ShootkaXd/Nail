@@ -98,7 +98,7 @@ export default function MyBookingsPage() {
                 <div key={a.id} className="surface p-5">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div>
-                      <p className="font-bold text-gray-900">{a.service.name}</p>
+                      <p className="font-bold text-gray-900">{a.services.map(s => s.service.name).join(', ')}</p>
                       <p className="text-sm text-gray-500">Мастер: {a.master.name}</p>
                     </div>
                     <Badge status={a.status} />

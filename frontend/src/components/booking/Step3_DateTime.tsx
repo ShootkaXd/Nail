@@ -7,7 +7,7 @@ import Button from '../ui/Button'
 import MapEmbed from '../ui/MapEmbed'
 
 interface Props {
-  service: Service
+  services: Service[]
   master: Master
   selectedSlot: string | null
   selectedDate: string | null
@@ -31,7 +31,7 @@ function addDays(date: Date, days: number) {
 const WEEKDAYS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб']
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
 
-export default function Step3DateTime({ service, master, selectedSlot, selectedDate, onSelect, onBack }: Props) {
+export default function Step3DateTime({ services, master, selectedSlot, selectedDate, onSelect, onBack }: Props) {
   const [date, setDate] = useState<string>(selectedDate ?? toLocalDateStr(new Date()))
   const [slots, setSlots] = useState<string[]>([])
   const [loadingSlots, setLoadingSlots] = useState(false)
@@ -41,17 +41,22 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
     return { year: d.getFullYear(), month: d.getMonth() }
   })
 
+  const serviceIds = services.map(s => s.id)
+  const idsKey = serviceIds.join(',')
+
   useEffect(() => {
-    publicApi.getPrice(service.id, master.id).then(setPriceInfo)
-  }, [service.id, master.id])
+    publicApi.getPrice(serviceIds, master.id).then(setPriceInfo)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey, master.id])
 
   useEffect(() => {
     setLoadingSlots(true)
     setSlots([])
-    publicApi.getSlots(master.id, service.id, date)
+    publicApi.getSlots(master.id, serviceIds, date)
       .then(setSlots)
       .finally(() => setLoadingSlots(false))
-  }, [date, master.id, service.id])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date, master.id, idsKey])
 
   const calendarDays = () => {
     const { year, month } = currentMonth
@@ -152,18 +157,24 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
 
           {priceInfo && (
             <div className="mt-4 p-4 bg-brand-50 rounded-xl border border-brand-100">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Стоимость</span>
-                <div className="text-right">
-                  {priceInfo.discountPercent > 0 && (
-                    <p className="text-sm text-gray-400 line-through">{priceInfo.basePrice.toLocaleString('ru-RU')} ₽</p>
-                  )}
-                  <p className="font-bold text-brand-600 text-lg">{priceInfo.finalPrice.toLocaleString('ru-RU')} ₽</p>
-                </div>
+              <div className="space-y-1 mb-2">
+                {priceInfo.services.map(s => (
+                  <div key={s.serviceId} className="flex justify-between items-center text-sm">
+                    <span className="text-gray-600">{s.name}</span>
+                    <span className="font-medium text-gray-900">
+                      {s.discountPercent > 0 && <span className="text-gray-400 line-through mr-1.5">{s.basePrice.toLocaleString('ru-RU')} ₽</span>}
+                      {s.finalPrice.toLocaleString('ru-RU')} ₽
+                    </span>
+                  </div>
+                ))}
               </div>
-              {priceInfo.promotionName && (
+              <div className="flex justify-between items-center pt-2 border-t border-brand-100">
+                <span className="text-gray-600">Итого ({priceInfo.totalDurationMinutes} мин)</span>
+                <p className="font-bold text-brand-600 text-lg">{priceInfo.totalFinalPrice.toLocaleString('ru-RU')} ₽</p>
+              </div>
+              {priceInfo.services.some(s => s.promotionName) && (
                 <p className="text-xs text-brand-500 mt-1 flex items-center gap-1">
-                  <Percent className="w-3.5 h-3.5 shrink-0" /> Акция: {priceInfo.promotionName} (-{priceInfo.discountPercent}%)
+                  <Percent className="w-3.5 h-3.5 shrink-0" /> Применена скидка по акции
                 </p>
               )}
             </div>

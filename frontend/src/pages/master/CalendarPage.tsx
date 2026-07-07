@@ -31,7 +31,7 @@ export default function CalendarPage() {
 
   const events = appointments.map(a => ({
     id: String(a.id),
-    title: `${a.clientName} — ${a.service.name}`,
+    title: `${a.clientName} — ${a.services.map(s => s.service.name).join(', ')}`,
     start: a.startAt,
     end: a.endAt,
     backgroundColor: STATUS_COLORS[a.status] ?? '#f43f5e',
@@ -91,7 +91,7 @@ export default function CalendarPage() {
             </div>
             <Row label="Клиент" value={selected.clientName} />
             <Row label="Телефон" value={selected.clientPhone} />
-            <Row label="Услуга" value={selected.service.name} />
+            <Row label={selected.services.length > 1 ? 'Услуги' : 'Услуга'} value={selected.services.map(s => s.service.name).join(', ')} />
             <Row label="Время" value={`${new Date(selected.startAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })} — ${new Date(selected.endAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`} />
             <Row label="Стоимость" value={`${selected.totalPrice.toLocaleString('ru-RU')} ₽`} />
             {selected.notes && <Row label="Пожелания" value={selected.notes} />}

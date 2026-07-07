@@ -21,9 +21,11 @@ function parseTime(timeStr: string, year: number, month: number, day: number): D
 
 export async function getAvailableSlots(
   masterId: number,
-  serviceId: number,
+  serviceIds: number[],
   dateStr: string
 ): Promise<string[]> {
+  if (serviceIds.length === 0) return []
+
   const [year, month, day] = dateStr.split('-').map(Number)
   // dayOfWeek must reflect the salon's local calendar date, not UTC's —
   // construct it from the same local wall-clock reference point (local noon
@@ -35,10 +37,11 @@ export async function getAvailableSlots(
   })
   if (!workingHour) return []
 
-  const service = await prisma.service.findUnique({ where: { id: serviceId } })
-  if (!service) return []
+  // Booking multiple services back-to-back needs a slot long enough for all of them combined.
+  const services = await prisma.service.findMany({ where: { id: { in: serviceIds } } })
+  if (services.length !== serviceIds.length) return []
 
-  const durationMs = service.durationMinutes * 60 * 1000
+  const durationMs = services.reduce((sum, s) => sum + s.durationMinutes, 0) * 60 * 1000
   const stepMs = 30 * 60 * 1000
 
   const workStart = parseTime(workingHour.startTime, year, month, day)

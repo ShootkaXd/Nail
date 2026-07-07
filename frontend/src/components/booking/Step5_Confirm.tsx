@@ -14,14 +14,14 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const { service, master, slot, date, contact, priceInfo } = booking
+  const { services, master, slot, date, contact, priceInfo } = booking
 
   const startDate = slot ? new Date(slot) : null
   const dateStr = startDate?.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })
   const timeStr = startDate?.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
 
   const handleConfirm = async () => {
-    if (!service || !master || !slot || !contact) return
+    if (services.length === 0 || !master || !slot || !contact) return
     setLoading(true)
     setError(null)
     try {
@@ -30,7 +30,7 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
         clientPhone: contact.phone,
         clientEmail: contact.email || undefined,
         masterId: master.id,
-        serviceId: service.id,
+        serviceIds: services.map(s => s.id),
         startAt: slot,
         notes: contact.notes || undefined,
         consent: true, // подтверждено чекбоксом на шаге контактов
@@ -53,12 +53,20 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
       <p className="text-gray-500 mb-6">Проверьте данные перед подтверждением</p>
 
       <div className="max-w-md surface p-6 space-y-4">
-        <Row label="Услуга" value={service?.name ?? ''} />
+        <div>
+          <p className="text-sm text-gray-500 mb-1">{services.length > 1 ? 'Услуги' : 'Услуга'}</p>
+          {services.map(s => (
+            <div key={s.id} className="flex justify-between text-sm py-0.5">
+              <span className="font-medium text-gray-900">{s.name}</span>
+              <span className="text-gray-500">{s.durationMinutes} мин</span>
+            </div>
+          ))}
+        </div>
         <Row label="Мастер" value={master?.name ?? ''} />
         {master?.masterProfile?.address && <Row label="Адрес" value={master.masterProfile.address} />}
         <Row label="Дата" value={dateStr ?? ''} />
         <Row label="Время" value={timeStr ?? ''} />
-        <Row label="Длительность" value={`${service?.durationMinutes} мин`} />
+        <Row label="Длительность" value={`${priceInfo?.totalDurationMinutes ?? services.reduce((s, x) => s + x.durationMinutes, 0)} мин`} />
         <div className="border-t border-gray-100 pt-4">
           <Row label="Имя" value={contact?.name ?? ''} />
           <Row label="Телефон" value={contact?.phone ?? ''} />
@@ -66,20 +74,19 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
           {contact?.notes && <Row label="Пожелания" value={contact.notes} />}
         </div>
         <div className="border-t border-gray-100 pt-4">
-          {priceInfo && priceInfo.discountPercent > 0 ? (
+          {priceInfo && priceInfo.totalBasePrice !== priceInfo.totalFinalPrice ? (
             <>
-              <Row label="Базовая цена" value={`${priceInfo.basePrice.toLocaleString('ru-RU')} ₽`} />
-              <Row label={`Скидка (${priceInfo.discountPercent}%)`} value={`-${(priceInfo.basePrice - priceInfo.finalPrice).toLocaleString('ru-RU')} ₽`} />
-              {priceInfo.promotionName && <Row label="Акция" value={priceInfo.promotionName} />}
+              <Row label="Базовая цена" value={`${priceInfo.totalBasePrice.toLocaleString('ru-RU')} ₽`} />
+              <Row label="Скидка" value={`-${(priceInfo.totalBasePrice - priceInfo.totalFinalPrice).toLocaleString('ru-RU')} ₽`} />
               <div className="flex justify-between font-bold text-lg mt-2">
                 <span>Итого</span>
-                <span className="text-brand-600">{priceInfo.finalPrice.toLocaleString('ru-RU')} ₽</span>
+                <span className="text-brand-600">{priceInfo.totalFinalPrice.toLocaleString('ru-RU')} ₽</span>
               </div>
             </>
           ) : (
             <div className="flex justify-between font-bold text-lg">
               <span>Итого</span>
-              <span className="text-brand-600">{priceInfo?.finalPrice.toLocaleString('ru-RU')} ₽</span>
+              <span className="text-brand-600">{priceInfo?.totalFinalPrice.toLocaleString('ru-RU')} ₽</span>
             </div>
           )}
         </div>

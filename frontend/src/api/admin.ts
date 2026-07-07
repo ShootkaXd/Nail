@@ -41,7 +41,7 @@ export const masterApi = {
   saveWorkingHours: (hours: WorkingHour[]) =>
     api.put<WorkingHour[]>('/working-hours', hours).then(r => r.data),
   myServices: () => api.get<Service[]>('/master/my-services').then(r => r.data),
-  createAppointment: (data: { clientName: string; clientPhone: string; clientEmail?: string; serviceId: number; startAt: string; notes?: string; status?: string }) =>
+  createAppointment: (data: { clientName: string; clientPhone: string; clientEmail?: string; serviceIds: number[]; startAt: string; notes?: string; status?: string; masterId?: number }) =>
     api.post<Appointment>('/appointments', data).then(r => r.data),
   listPhotos: () => api.get<MasterPhoto[]>('/master/photos').then(r => r.data),
   uploadPhoto: (file: File, caption?: string) => {

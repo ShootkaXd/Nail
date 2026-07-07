@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Check } from 'lucide-react'
 import { masterApi } from '../../api/admin'
 import { publicApi } from '../../api/public'
 import { useAuthStore } from '../../store/auth.store'
@@ -14,7 +15,7 @@ function toLocalDateStr(d: Date) {
 export default function MasterBookingForm({ onDone, onCancel }: { onDone: () => void; onCancel: () => void }) {
   const { user } = useAuthStore()
   const [services, setServices] = useState<Service[]>([])
-  const [serviceId, setServiceId] = useState<number | ''>('')
+  const [serviceIds, setServiceIds] = useState<number[]>([])
   const [date, setDate] = useState(toLocalDateStr(new Date()))
   const [slots, setSlots] = useState<string[]>([])
   const [slot, setSlot] = useState<string | null>(null)
@@ -25,19 +26,25 @@ export default function MasterBookingForm({ onDone, onCancel }: { onDone: () => 
 
   useEffect(() => { masterApi.myServices().then(setServices) }, [])
 
+  const idsKey = serviceIds.join(',')
+
   useEffect(() => {
-    if (!serviceId || !user) { setSlots([]); return }
+    if (serviceIds.length === 0 || !user) { setSlots([]); return }
     setLoadingSlots(true)
     setSlot(null)
-    publicApi.getSlots(user.id, Number(serviceId), date)
+    publicApi.getSlots(user.id, serviceIds, date)
       .then(setSlots)
       .finally(() => setLoadingSlots(false))
-  }, [serviceId, date, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey, date, user])
+
+  const toggleService = (id: number) =>
+    setServiceIds(ids => ids.includes(id) ? ids.filter(x => x !== id) : [...ids, id])
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (!serviceId) return setError('Выберите услугу')
+    if (serviceIds.length === 0) return setError('Выберите хотя бы одну услугу')
     if (!slot) return setError('Выберите время')
     if (!form.clientName || !form.clientPhone) return setError('Укажите имя и телефон клиента')
     setSaving(true)
@@ -46,7 +53,7 @@ export default function MasterBookingForm({ onDone, onCancel }: { onDone: () => 
         clientName: form.clientName,
         clientPhone: form.clientPhone,
         clientEmail: form.clientEmail || undefined,
-        serviceId: Number(serviceId),
+        serviceIds,
         startAt: slot,
         notes: form.notes || undefined,
         status: 'confirmed',
@@ -60,17 +67,27 @@ export default function MasterBookingForm({ onDone, onCancel }: { onDone: () => 
   return (
     <form onSubmit={submit} className="space-y-4">
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-gray-700">Услуга *</label>
-        <select value={serviceId} onChange={e => setServiceId(e.target.value ? Number(e.target.value) : '')}
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm">
-          <option value="">Выберите услугу</option>
-          {services.map(s => <option key={s.id} value={s.id}>{s.name} — {s.price} ₽ ({s.durationMinutes} мин)</option>)}
-        </select>
+        <label className="text-sm font-medium text-gray-700">Услуги *</label>
+        <div className="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto">
+          {services.map(s => {
+            const isSelected = serviceIds.includes(s.id)
+            return (
+              <label key={s.id} className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition ${isSelected ? 'border-brand-300 bg-brand-50' : 'border-gray-200 hover:border-gray-300'}`}>
+                <div className={`w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 ${isSelected ? 'bg-brand-500 border-brand-500' : 'border-gray-300'}`}>
+                  {isSelected && <Check className="w-3 h-3 text-white" />}
+                </div>
+                <input type="checkbox" checked={isSelected} onChange={() => toggleService(s.id)} className="hidden" />
+                <span className="text-sm text-gray-700 flex-1">{s.name}</span>
+                <span className="text-xs text-gray-400">{s.price} ₽ · {s.durationMinutes} мин</span>
+              </label>
+            )
+          })}
+        </div>
       </div>
 
       <Input label="Дата *" type="date" value={date} onChange={e => setDate(e.target.value)} />
 
-      {serviceId && (
+      {serviceIds.length > 0 && (
         <div>
           <label className="text-sm font-medium text-gray-700 block mb-2">Время *</label>
           {loadingSlots ? <p className="text-sm text-gray-400">Загрузка...</p> : slots.length === 0 ? (

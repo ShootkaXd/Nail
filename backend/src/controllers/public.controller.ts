@@ -13,14 +13,24 @@ export async function getServices(req: Request, res: Response) {
   res.json(services)
 }
 
-export async function getMasters(req: Request, res: Response) {
-  const { serviceId } = req.query
+function parseServiceIds(raw: unknown): number[] {
+  if (!raw) return []
+  return String(raw)
+    .split(',')
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n > 0)
+}
 
-  const where = serviceId
+export async function getMasters(req: Request, res: Response) {
+  const serviceIds = parseServiceIds(req.query.serviceIds ?? req.query.serviceId)
+
+  // A master must offer EVERY requested service to show up (one master does
+  // the whole combined booking back-to-back — no splitting across masters).
+  const where = serviceIds.length
     ? {
-        masterProfile: {
-          masterServices: { some: { serviceId: Number(serviceId) } },
-        },
+        AND: serviceIds.map((id) => ({
+          masterProfile: { masterServices: { some: { serviceId: id } } },
+        })),
       }
     : { masterProfile: { isNot: null } }
 
@@ -37,7 +47,7 @@ export async function getMasters(req: Request, res: Response) {
           address: true,
           avatarUrl: true,
           masterServices: {
-            where: serviceId ? { serviceId: Number(serviceId) } : undefined,
+            where: serviceIds.length ? { serviceId: { in: serviceIds } } : undefined,
             select: { customPrice: true, serviceId: true },
           },
         },
@@ -72,25 +82,27 @@ export async function getMastersGallery(_req: Request, res: Response) {
 }
 
 export async function getSlots(req: Request, res: Response) {
-  const { masterId, serviceId, date } = req.query
-  if (!masterId || !serviceId || !date) {
-    return res.status(400).json({ error: 'masterId, serviceId, date required' })
+  const { masterId, date } = req.query
+  const serviceIds = parseServiceIds(req.query.serviceIds ?? req.query.serviceId)
+  if (!masterId || serviceIds.length === 0 || !date) {
+    return res.status(400).json({ error: 'masterId, serviceIds, date required' })
   }
-  const slots = await getAvailableSlots(Number(masterId), Number(serviceId), String(date))
+  const slots = await getAvailableSlots(Number(masterId), serviceIds, String(date))
   res.json(slots)
 }
 
 export async function getPrice(req: Request, res: Response) {
-  const { serviceId, masterId } = req.query
-  if (!serviceId || !masterId) {
-    return res.status(400).json({ error: 'serviceId, masterId required' })
+  const { masterId } = req.query
+  const serviceIds = parseServiceIds(req.query.serviceIds ?? req.query.serviceId)
+  if (serviceIds.length === 0 || !masterId) {
+    return res.status(400).json({ error: 'serviceIds, masterId required' })
   }
-  const info = await calculatePrice(Number(serviceId), Number(masterId))
+  const info = await calculatePrice(serviceIds, Number(masterId))
   res.json(info)
 }
 
 export async function createAppointment(req: Request, res: Response) {
-  const { clientName, clientPhone, clientEmail, masterId, serviceId, startAt, notes } = req.body
+  const { clientName, clientPhone, clientEmail, masterId, serviceIds, startAt, notes } = req.body
 
   // Enforce per-config required fields (body already validated by zod)
   const form = await getBookingForm()
@@ -101,11 +113,12 @@ export async function createAppointment(req: Request, res: Response) {
     return res.status(400).json({ error: 'Поле «Пожелания» обязательно' })
   }
 
-  const service = await prisma.service.findUnique({ where: { id: Number(serviceId) } })
-  if (!service) return res.status(404).json({ error: 'Service not found' })
+  const ids: number[] = serviceIds.map(Number)
+  const priceInfo = await calculatePrice(ids, Number(masterId)).catch(() => null)
+  if (!priceInfo) return res.status(404).json({ error: 'Услуга не найдена' })
 
   const start = new Date(startAt)
-  const end = new Date(start.getTime() + service.durationMinutes * 60 * 1000)
+  const end = new Date(start.getTime() + priceInfo.totalDurationMinutes * 60 * 1000)
 
   const conflict = await prisma.appointment.findFirst({
     where: {
@@ -117,8 +130,6 @@ export async function createAppointment(req: Request, res: Response) {
   })
   if (conflict) return res.status(409).json({ error: 'Time slot no longer available' })
 
-  const priceInfo = await calculatePrice(Number(serviceId), Number(masterId))
-
   const appointment = await prisma.appointment.create({
     data: {
       clientName,
@@ -126,14 +137,16 @@ export async function createAppointment(req: Request, res: Response) {
       clientPhoneDigits: normalizePhoneDigits(clientPhone),
       clientEmail: clientEmail || null,
       masterId: Number(masterId),
-      serviceId: Number(serviceId),
       startAt: start,
       endAt: end,
       notes: notes || null,
-      totalPrice: priceInfo.finalPrice,
+      totalPrice: priceInfo.totalFinalPrice,
       status: 'pending',
+      services: {
+        create: priceInfo.services.map((s) => ({ serviceId: s.serviceId, price: s.finalPrice })),
+      },
     },
-    include: { master: { select: { name: true } }, service: true },
+    include: { master: { select: { name: true } }, services: { include: { service: true } } },
   })
 
   res.status(201).json(appointment)
@@ -141,7 +154,7 @@ export async function createAppointment(req: Request, res: Response) {
 
 const myAppointmentsInclude = {
   master: { select: { id: true, name: true } },
-  service: { select: { id: true, name: true, category: true } },
+  services: { include: { service: { select: { id: true, name: true, category: true } } } },
 }
 
 // Client looks up their own bookings by phone number — no account needed.

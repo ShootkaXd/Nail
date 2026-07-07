@@ -5,7 +5,7 @@ import { normalizePhoneDigits } from '../lib/phone'
 
 const include = {
   master: { select: { id: true, name: true } },
-  service: { select: { id: true, name: true, category: true } },
+  services: { include: { service: { select: { id: true, name: true, category: true } } } },
 }
 
 // Services offered by the current master (for their own booking form)
@@ -24,18 +24,19 @@ export async function myServices(req: Request, res: Response) {
 // Master (or admin) books a client manually.
 // Master can only book for themselves; admin must pass masterId.
 export async function createByStaff(req: Request, res: Response) {
-  const { clientName, clientPhone, clientEmail, serviceId, startAt, notes, status } = req.body
+  const { clientName, clientPhone, clientEmail, serviceIds, startAt, notes, status } = req.body
   const masterId = req.user!.role === 'master' ? req.user!.id : Number(req.body.masterId)
 
-  if (!clientName || !clientPhone || !serviceId || !startAt || !masterId) {
+  const ids: number[] = Array.isArray(serviceIds) ? serviceIds.map(Number).filter((n) => n > 0) : []
+  if (!clientName || !clientPhone || ids.length === 0 || !startAt || !masterId) {
     return res.status(400).json({ error: 'Заполните обязательные поля' })
   }
 
-  const service = await prisma.service.findUnique({ where: { id: Number(serviceId) } })
-  if (!service) return res.status(404).json({ error: 'Услуга не найдена' })
+  const priceInfo = await calculatePrice(ids, masterId).catch(() => null)
+  if (!priceInfo) return res.status(404).json({ error: 'Услуга не найдена' })
 
   const start = new Date(startAt)
-  const end = new Date(start.getTime() + service.durationMinutes * 60 * 1000)
+  const end = new Date(start.getTime() + priceInfo.totalDurationMinutes * 60 * 1000)
 
   const conflict = await prisma.appointment.findFirst({
     where: {
@@ -47,8 +48,6 @@ export async function createByStaff(req: Request, res: Response) {
   })
   if (conflict) return res.status(409).json({ error: 'Это время уже занято' })
 
-  const priceInfo = await calculatePrice(Number(serviceId), masterId)
-
   const appointment = await prisma.appointment.create({
     data: {
       clientName,
@@ -56,12 +55,14 @@ export async function createByStaff(req: Request, res: Response) {
       clientPhoneDigits: normalizePhoneDigits(clientPhone),
       clientEmail: clientEmail || null,
       masterId,
-      serviceId: Number(serviceId),
       startAt: start,
       endAt: end,
       notes: notes || null,
-      totalPrice: priceInfo.finalPrice,
+      totalPrice: priceInfo.totalFinalPrice,
       status: status && ['pending', 'confirmed', 'completed'].includes(status) ? status : 'confirmed',
+      services: {
+        create: priceInfo.services.map((s) => ({ serviceId: s.serviceId, price: s.finalPrice })),
+      },
     },
     include,
   })

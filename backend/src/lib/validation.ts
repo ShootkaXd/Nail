@@ -44,7 +44,7 @@ export const createAppointmentSchema = z.object({
   clientPhone: z.string().trim().min(5, 'Введите телефон').max(32),
   clientEmail: z.string().trim().email('Неверный email').max(160).optional().or(z.literal('')),
   masterId: z.coerce.number().int().positive(),
-  serviceId: z.coerce.number().int().positive(),
+  serviceIds: z.array(z.coerce.number().int().positive()).min(1, 'Выберите хотя бы одну услугу').max(5, 'Не более 5 услуг за одну запись'),
   startAt: z.string().datetime({ message: 'Неверная дата' }),
   notes: z.string().trim().max(1000).optional().or(z.literal('')),
   // 152-ФЗ: согласие на обработку персональных данных обязательно
