@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
@@ -22,14 +22,43 @@ const imageUpload = multer({
   storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (_req, file, cb) => {
+    // Client-declared mimetype only gates the field name/extension choice —
+    // real content is verified against magic bytes below, after the file
+    // has landed on disk, since multer's fileFilter runs on the stream
+    // before any bytes are available.
     if (allowed.includes(file.mimetype)) cb(null, true)
     else cb(new Error('Разрешены только изображения (jpg, png, webp, gif)'))
   },
 })
 
-export const uploadMiddleware = imageUpload.single('photo')
-export const logoUploadMiddleware = imageUpload.single('logo')
-export const avatarUploadMiddleware = imageUpload.single('avatar')
+// Verifies the first bytes of the uploaded file actually match a known image
+// signature — a spoofed `Content-Type` header alone would pass fileFilter.
+function hasValidImageSignature(filePath: string): boolean {
+  const fd = fs.openSync(filePath, 'r')
+  const buf = Buffer.alloc(12)
+  fs.readSync(fd, buf, 0, 12, 0)
+  fs.closeSync(fd)
+
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return true // JPEG
+  if (buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return true // PNG
+  if (buf.subarray(0, 3).toString('ascii') === 'GIF') return true // GIF
+  if (buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WEBP') return true // WEBP
+  return false
+}
+
+function verifyImageMiddleware(req: Request, res: Response, next: NextFunction) {
+  if (!req.file) return next()
+  const filePath = path.join(UPLOAD_DIR, req.file.filename)
+  if (!hasValidImageSignature(filePath)) {
+    fs.unlink(filePath, () => {})
+    return res.status(400).json({ error: 'Файл повреждён или не является изображением' })
+  }
+  next()
+}
+
+export const uploadMiddleware = [imageUpload.single('photo'), verifyImageMiddleware]
+export const logoUploadMiddleware = [imageUpload.single('logo'), verifyImageMiddleware]
+export const avatarUploadMiddleware = [imageUpload.single('avatar'), verifyImageMiddleware]
 
 async function resolveProfileId(userId: number, role: string, bodyMasterId?: unknown): Promise<number | null> {
   if (role === 'admin' && bodyMasterId) {

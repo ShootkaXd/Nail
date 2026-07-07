@@ -21,6 +21,24 @@ export const setupSchema = z.object({
   password: passwordSchema,
 })
 
+export const createAdminSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  login: z.string().trim().min(2, 'Логин не короче 2 символов').max(64).regex(/^[A-Za-z0-9_.-]+$/, 'Логин: латиница, цифры, _ . -'),
+  email: z.string().trim().email('Неверный email').max(160).optional().or(z.literal('')),
+  password: passwordSchema,
+})
+
+export const createMasterSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  login: z.string().trim().min(2, 'Логин не короче 2 символов').max(64).regex(/^[A-Za-z0-9_.-]+$/, 'Логин: латиница, цифры, _ . -'),
+  email: z.string().trim().email('Неверный email').max(160).optional().or(z.literal('')),
+  phone: z.string().trim().max(32).optional().or(z.literal('')),
+  password: passwordSchema,
+  bio: z.string().trim().max(1000).optional().or(z.literal('')),
+  address: z.string().trim().max(300).optional().or(z.literal('')),
+  serviceIds: z.array(z.coerce.number().int().positive()).optional(),
+})
+
 export const createAppointmentSchema = z.object({
   clientName: z.string().trim().min(1, 'Введите имя').max(120),
   clientPhone: z.string().trim().min(5, 'Введите телефон').max(32),

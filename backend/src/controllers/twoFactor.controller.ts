@@ -5,6 +5,31 @@ import QRCode from 'qrcode'
 import prisma from '../lib/prisma'
 import { issueSessionToken, verifyPreAuthToken } from '../lib/token'
 
+// Per-account TOTP attempt tracking — independent of the IP-based authLimiter,
+// so a distributed brute force (many IPs, one target account) still gets locked out.
+const MAX_ATTEMPTS = 5
+const LOCKOUT_MS = 15 * 60 * 1000
+const failedAttempts = new Map<number, { count: number; lockedUntil: number }>()
+
+function isLocked(userId: number): boolean {
+  const entry = failedAttempts.get(userId)
+  return !!entry && entry.lockedUntil > Date.now()
+}
+
+function recordFailure(userId: number) {
+  const entry = failedAttempts.get(userId) ?? { count: 0, lockedUntil: 0 }
+  entry.count += 1
+  if (entry.count >= MAX_ATTEMPTS) {
+    entry.lockedUntil = Date.now() + LOCKOUT_MS
+    entry.count = 0
+  }
+  failedAttempts.set(userId, entry)
+}
+
+function clearFailures(userId: number) {
+  failedAttempts.delete(userId)
+}
+
 // Step 1 (authenticated, password re-check): generate a pending secret and
 // return a QR code — not yet active until confirmed via /enable.
 export async function setupTwoFactor(req: Request, res: Response) {
@@ -64,8 +89,16 @@ export async function verifyTwoFactorLogin(req: Request, res: Response) {
     return res.status(400).json({ error: '2FA не включена для этого пользователя' })
   }
 
+  if (isLocked(user.id)) {
+    return res.status(429).json({ error: 'Слишком много неверных попыток. Попробуйте позже.' })
+  }
+
   const valid = authenticator.verify({ token: String(code || ''), secret: user.twoFactorSecret })
-  if (!valid) return res.status(401).json({ error: 'Неверный код' })
+  if (!valid) {
+    recordFailure(user.id)
+    return res.status(401).json({ error: 'Неверный код' })
+  }
+  clearFailures(user.id)
 
   const token = issueSessionToken(user)
   res.json({ token, user: { id: user.id, name: user.name, role: user.role, email: user.email } })

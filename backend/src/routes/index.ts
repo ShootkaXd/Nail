@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { login, me } from '../controllers/auth.controller'
 import { authenticate, requireRole } from '../middleware/auth'
 import { authLimiter, bookingLimiter, myBookingsLimiter } from '../middleware/rateLimit'
-import { validateBody, loginSchema, setupSchema, createAppointmentSchema } from '../lib/validation'
+import { validateBody, loginSchema, setupSchema, createAppointmentSchema, createAdminSchema, createMasterSchema } from '../lib/validation'
 import { listServices, createService, updateService, deleteService } from '../controllers/services.controller'
 import { listMasters, createMaster, updateMaster, deleteMaster, getMyProfile, updateMyProfile } from '../controllers/masters.controller'
 import { listPromotions, createPromotion, updatePromotion, deletePromotion } from '../controllers/promotions.controller'
@@ -54,13 +54,13 @@ router.delete('/services/:id', authenticate, requireRole('admin'), deleteService
 
 // Admin — masters
 router.get('/masters', authenticate, requireRole('admin'), listMasters)
-router.post('/masters', authenticate, requireRole('admin'), createMaster)
+router.post('/masters', authenticate, requireRole('admin'), validateBody(createMasterSchema), createMaster)
 router.put('/masters/:id', authenticate, requireRole('admin'), updateMaster)
 router.delete('/masters/:id', authenticate, requireRole('admin'), deleteMaster)
 
 // Admin — admins management
 router.get('/admins', authenticate, requireRole('admin'), listAdmins)
-router.post('/admins', authenticate, requireRole('admin'), createAdmin)
+router.post('/admins', authenticate, requireRole('admin'), validateBody(createAdminSchema), createAdmin)
 router.delete('/admins/:id', authenticate, requireRole('admin'), deleteAdmin)
 
 // Admin — promotions

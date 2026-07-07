@@ -9,6 +9,14 @@ if (missing.length > 0) {
   process.exit(1)
 }
 
+// In production, an unset CORS_ORIGIN must NOT silently fall back to "*" —
+// combined with credentials:true that reflects any origin back with cookies/
+// auth headers allowed. Fail loudly instead of shipping an open CORS policy.
+if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN) {
+  console.error('\n❌ CORS_ORIGIN обязателен в production (укажите домен(ы) фронтенда через запятую)\n')
+  process.exit(1)
+}
+
 export const env = {
   DATABASE_URL: process.env.DATABASE_URL!,
   JWT_SECRET: process.env.JWT_SECRET!,

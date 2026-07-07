@@ -14,10 +14,12 @@ const app = express()
 app.set('trust proxy', 1)
 app.disable('x-powered-by')
 
-// Security headers
+// Security headers. This process only ever serves JSON + static /uploads
+// images, never HTML, so helmet's default CSP (default-src 'self') is safe
+// here and closes off any accidental HTML-rendering surface; the actual SPA
+// is served by a separate origin and gets its own CSP at the proxy layer.
 app.use(
   helmet({
-    contentSecurityPolicy: false, // SPA served separately; configure at proxy if needed
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 )

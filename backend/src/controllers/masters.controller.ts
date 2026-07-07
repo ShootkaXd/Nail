@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import bcrypt from 'bcryptjs'
 import prisma from '../lib/prisma'
+import { passwordSchema } from '../lib/validation'
 
 export async function listMasters(req: Request, res: Response) {
   const masters = await prisma.user.findMany({
@@ -21,7 +22,19 @@ export async function listMasters(req: Request, res: Response) {
 
 export async function createMaster(req: Request, res: Response) {
   const { name, login, email, phone, password, bio, address, serviceIds } = req.body
-  const passwordHash = await bcrypt.hash(password || "master123", 12)
+  if (!name || !login) {
+    return res.status(400).json({ error: 'Имя и логин обязательны' })
+  }
+  if (!password) {
+    return res.status(400).json({ error: 'Пароль обязателен' })
+  }
+  const pw = passwordSchema.safeParse(password)
+  if (!pw.success) return res.status(400).json({ error: pw.error.errors[0].message })
+
+  const existing = await prisma.user.findUnique({ where: { login } })
+  if (existing) return res.status(409).json({ error: 'Такой логин уже занят' })
+
+  const passwordHash = await bcrypt.hash(password, 12)
 
   const user = await prisma.user.create({
     data: {
@@ -45,12 +58,23 @@ export async function updateMaster(req: Request, res: Response) {
   const id = Number(req.params.id)
   const { name, login, email, phone, bio, address, serviceIds, password } = req.body
 
+  // Prevent this master-management endpoint from being used to edit an
+  // unrelated user (e.g. another admin account) by passing an arbitrary id.
+  const target = await prisma.user.findUnique({ where: { id }, select: { role: true } })
+  if (!target || target.role !== 'master') {
+    return res.status(404).json({ error: 'Мастер не найден' })
+  }
+
   const updateData: Record<string, unknown> = {}
   if (name) updateData.name = name
   if (login) updateData.login = login
   if (email) updateData.email = email
   if (phone !== undefined) updateData.phone = phone
-  if (password) updateData.passwordHash = await bcrypt.hash(password, 12)
+  if (password) {
+    const pw = passwordSchema.safeParse(password)
+    if (!pw.success) return res.status(400).json({ error: pw.error.errors[0].message })
+    updateData.passwordHash = await bcrypt.hash(password, 12)
+  }
 
   const user = await prisma.user.update({
     where: { id },
@@ -98,6 +122,11 @@ export async function updateMyProfile(req: Request, res: Response) {
 }
 
 export async function deleteMaster(req: Request, res: Response) {
-  await prisma.user.delete({ where: { id: Number(req.params.id) } })
+  const id = Number(req.params.id)
+  const target = await prisma.user.findUnique({ where: { id }, select: { role: true } })
+  if (!target || target.role !== 'master') {
+    return res.status(404).json({ error: 'Мастер не найден' })
+  }
+  await prisma.user.delete({ where: { id } })
   res.status(204).send()
 }

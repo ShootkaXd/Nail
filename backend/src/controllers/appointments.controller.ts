@@ -106,6 +106,14 @@ export async function updateStatus(req: Request, res: Response) {
   if (!validStatuses.includes(status)) {
     return res.status(400).json({ error: 'Invalid status' })
   }
+
+  const existing = await prisma.appointment.findUnique({ where: { id: Number(id) }, select: { masterId: true } })
+  if (!existing) return res.status(404).json({ error: 'Запись не найдена' })
+  // A master may only change the status of their own appointments — not another master's.
+  if (req.user!.role === 'master' && existing.masterId !== req.user!.id) {
+    return res.status(403).json({ error: 'Нет доступа' })
+  }
+
   const appointment = await prisma.appointment.update({
     where: { id: Number(id) },
     data: { status },
