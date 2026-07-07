@@ -38,7 +38,7 @@ export default function ReportsPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Бухгалтерия — учёт заработка</h1>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-wrap items-end gap-3">
+      <div className="surface p-4 mb-6 flex flex-wrap items-end gap-3">
         <div>
           <label className="text-xs text-gray-500 block mb-1">С даты</label>
           <input type="date" value={filters.from} onChange={e => setFilters(f => ({ ...f, from: e.target.value }))}
@@ -68,7 +68,7 @@ export default function ReportsPage() {
               <p className="text-brand-100 text-sm">Общий заработок</p>
               <p className="text-3xl font-bold mt-1">{money(report.total)}</p>
             </div>
-            <div className="bg-white rounded-2xl border border-gray-200 p-6 animate-fade-in-up [animation-delay:60ms]">
+            <div className="surface p-6 animate-fade-in-up [animation-delay:60ms]">
               <p className="text-gray-500 text-sm">Количество записей</p>
               <p className="text-3xl font-bold mt-1 text-gray-900">{report.count}</p>
               <p className="text-xs text-gray-400 mt-1">Средний чек: {money(report.count ? Math.round(report.total / report.count) : 0)}</p>
@@ -88,7 +88,7 @@ export default function ReportsPage() {
 
 function ReportTable({ title, rows, total }: { title: string; rows: Array<{ name: string; sub: string; count: number; total: number }>; total: number }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+    <div className="surface overflow-x-auto">
       <div className="px-4 py-3 border-b border-gray-100 font-semibold text-gray-900">{title}</div>
       <table className="w-full text-sm">
         <thead className="bg-gray-50 border-b border-gray-200 text-gray-500">

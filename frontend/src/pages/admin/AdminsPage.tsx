@@ -85,7 +85,7 @@ export default function AdminsPage() {
         <TwoFactorSettings enabled={twoFactorEnabled} onChanged={setTwoFactorEnabled} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto max-w-3xl">
+      <div className="surface overflow-x-auto max-w-3xl">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>

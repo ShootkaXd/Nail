@@ -82,7 +82,7 @@ export default function PortfolioPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-2">Моё портфолио</h1>
       <p className="text-gray-500 text-sm mb-6">Фотографии работ видны клиентам на странице «Наши мастера».</p>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 max-w-lg">
+      <div className="surface p-5 mb-6 max-w-lg">
         <h2 className="font-semibold text-gray-900 mb-3">Мой профиль</h2>
         <div className="space-y-3">
           <div className="flex items-center gap-4">
@@ -113,7 +113,7 @@ export default function PortfolioPage() {
         <TwoFactorSettings enabled={twoFactorEnabled} onChanged={setTwoFactorEnabled} />
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6 max-w-lg">
+      <div className="surface p-5 mb-6 max-w-lg">
         <Input label="Подпись к фото (необязательно)" value={caption} onChange={e => setCaption(e.target.value)} placeholder="Например: Гель-лак, френч" />
         <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
         <div className="mt-4">

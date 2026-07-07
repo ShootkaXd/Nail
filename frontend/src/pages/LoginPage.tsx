@@ -64,17 +64,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 to-brand-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm">
+    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-brand-100 flex items-center justify-center p-4">
+      <div className="surface shadow-xl p-8 w-full max-w-sm animate-scale-in">
         <div className="text-center mb-8">
           {site.logoUrl ? (
-            <img src={site.logoUrl} alt={site.salonName} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-4" />
+            <img src={site.logoUrl} alt={site.salonName} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-4 shadow-sm" />
           ) : (
-            <div className="w-16 h-16 bg-brand-500 rounded-2xl flex items-center justify-center text-white mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-brand-400 to-brand-600 rounded-2xl flex items-center justify-center text-white mx-auto mb-4 shadow-md shadow-brand-500/25 animate-pop-in">
               {preAuthToken ? <ShieldCheck className="w-8 h-8" /> : <Sparkles className="w-8 h-8" />}
             </div>
           )}
-          <h1 className="text-2xl font-bold text-gray-900">{site.salonName}</h1>
+          <h1 className="text-2xl font-extrabold text-gradient">{site.salonName}</h1>
           <p className="text-gray-500 text-sm mt-1">{preAuthToken ? 'Введите код из приложения-аутентификатора' : 'Вход для сотрудников'}</p>
         </div>
 

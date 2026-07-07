@@ -75,7 +75,7 @@ export default function ServicesPage() {
       {Object.entries(grouped).map(([cat, items]) => (
         <div key={cat} className="mb-8">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">{cat}</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+          <div className="surface overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>

@@ -52,7 +52,7 @@ export default function Step5Confirm({ booking, onConfirm, onBack }: Props) {
       <h2 className="text-2xl font-bold text-gray-900 mb-1">Подтверждение записи</h2>
       <p className="text-gray-500 mb-6">Проверьте данные перед подтверждением</p>
 
-      <div className="max-w-md bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+      <div className="max-w-md surface p-6 space-y-4">
         <Row label="Услуга" value={service?.name ?? ''} />
         <Row label="Мастер" value={master?.name ?? ''} />
         {master?.masterProfile?.address && <Row label="Адрес" value={master.masterProfile.address} />}

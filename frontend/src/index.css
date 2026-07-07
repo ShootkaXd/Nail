@@ -14,12 +14,17 @@
   --brand-700: #714a34;
   --brand-800: #5c3c2b;
   --brand-900: #4a3123;
-  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-theme;
+    @apply bg-gray-50 text-gray-900 font-theme antialiased;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
   }
 
   /* Smooth color/shadow/opacity transitions everywhere by default */
@@ -30,7 +35,19 @@
 
 @layer utilities {
   .card-hover {
-    @apply transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md;
+    @apply transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg;
+  }
+
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/60;
+  }
+
+  .surface {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_1px_3px_rgba(16,24,40,0.06)];
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-600 to-brand-400 bg-clip-text text-transparent;
   }
 
   .skeleton {

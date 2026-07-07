@@ -94,7 +94,7 @@ export default function MyBookingsPage() {
           ) : (
             <div className="space-y-3">
               {appointments.map(a => (
-                <div key={a.id} className="bg-white rounded-2xl border border-gray-200 p-5">
+                <div key={a.id} className="surface p-5">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div>
                       <p className="font-bold text-gray-900">{a.service.name}</p>

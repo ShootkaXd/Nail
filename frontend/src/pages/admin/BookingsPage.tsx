@@ -40,7 +40,7 @@ export default function BookingsPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Записи</h1>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-wrap gap-3">
+      <div className="surface p-4 mb-6 flex flex-wrap gap-3">
         <select value={filters.status} onChange={e => setFilters(f => ({ ...f, status: e.target.value }))}
           className="rounded-lg border border-gray-300 px-3 py-2 text-sm">
           <option value="">Все статусы</option>
@@ -60,7 +60,7 @@ export default function BookingsPage() {
       </div>
 
       {loading ? <Spinner /> : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+        <div className="surface overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>

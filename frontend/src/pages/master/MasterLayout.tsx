@@ -17,9 +17,9 @@ export default function MasterLayout() {
   const handleLogout = () => { logout(); navigate('/login') }
 
   const logo = site.logoUrl ? (
-    <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+    <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-2xl object-cover shrink-0 shadow-sm" />
   ) : (
-    <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white shrink-0">
+    <div className="w-10 h-10 bg-gradient-to-br from-brand-400 to-brand-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-md shadow-brand-500/25">
       <Sparkles className="w-5 h-5" />
     </div>
   )
@@ -32,7 +32,7 @@ export default function MasterLayout() {
           <div className="flex items-center gap-3">
             {logo}
             <div className="min-w-0">
-              <p className="font-bold text-gray-900 text-sm truncate">{site.salonName}</p>
+              <p className="font-extrabold text-gradient text-sm truncate">{site.salonName}</p>
               <p className="text-xs text-gray-400">Мастер</p>
             </div>
           </div>

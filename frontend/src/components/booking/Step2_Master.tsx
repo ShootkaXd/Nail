@@ -42,10 +42,10 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
                 key={m.id}
                 onClick={() => onSelect(m)}
                 style={{ animationDelay: `${i * 50}ms` }}
-                className={`text-left p-5 rounded-xl border-2 transition-all animate-fade-in-up opacity-0 [animation-fill-mode:forwards] ${
+                className={`text-left p-5 rounded-2xl border-2 transition-all animate-fade-in-up opacity-0 [animation-fill-mode:forwards] ${
                   selected?.id === m.id
-                    ? 'border-brand-500 bg-brand-50'
-                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm hover:-translate-y-0.5'
+                    ? 'border-brand-500 bg-brand-50 shadow-sm'
+                    : 'border-gray-100 bg-gray-50/60 hover:border-brand-300 hover:bg-white hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
                 <div className="flex items-center gap-4">

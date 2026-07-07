@@ -110,7 +110,7 @@ export default function SettingsPage() {
 
       {/* Salon identity & legal requisites */}
       {site && (
-        <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <section className="surface p-6 mb-6">
           <h2 className="font-semibold text-gray-900 mb-4">Салон: название, логотип, реквизиты</h2>
           <div className="space-y-4">
             <div className="flex items-center gap-4">
@@ -169,7 +169,7 @@ export default function SettingsPage() {
       )}
 
       {/* Colors & fonts */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+      <section className="surface p-6 mb-6">
         <h2 className="font-semibold text-gray-900 mb-1">Оформление: цвет и шрифт</h2>
         <p className="text-sm text-gray-500 mb-4">Основной цвет сайта (кнопки, ссылки, акценты) и шрифт текста.</p>
 
@@ -221,7 +221,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Booking form */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+      <section className="surface p-6 mb-6">
         <h2 className="font-semibold text-gray-900 mb-4">Форма записи для клиентов</h2>
         <div className="space-y-4">
           <Input label="Заголовок" value={config.title} onChange={e => setConfig({ ...config, title: e.target.value })} />
@@ -266,7 +266,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Seasonal theme */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+      <section className="surface p-6 mb-6">
         <h2 className="font-semibold text-gray-900 mb-1">Оформление по временам года</h2>
         <p className="text-sm text-gray-500 mb-4">Тема оформления страницы записи. «Авто» — определяется по текущей дате.</p>
         <div className="flex flex-wrap gap-2">
@@ -285,7 +285,7 @@ export default function SettingsPage() {
       </section>
 
       {/* Updates */}
-      <section className="bg-white rounded-xl border border-gray-200 p-6">
+      <section className="surface p-6">
         <h2 className="font-semibold text-gray-900 mb-4">Версия и обновления</h2>
         {version && (
           <div className="text-sm text-gray-600 mb-4 space-y-1">

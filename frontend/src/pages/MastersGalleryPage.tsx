@@ -24,19 +24,19 @@ export default function MastersGalleryPage() {
   return (
     <div className={`min-h-screen flex flex-col bg-gradient-to-br ${theme.gradient}`}>
       <SeasonalEffects season={theme.season} />
-      <header className={`bg-white/80 backdrop-blur shadow-sm border-b ${theme.headerBorder}`}>
+      <header className={`sticky top-0 z-30 glass shadow-sm ${theme.headerBorder}`}>
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             {site.logoUrl ? (
-              <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-xl object-cover shrink-0" />
+              <img src={site.logoUrl} alt={site.salonName} className="w-10 h-10 rounded-2xl object-cover shrink-0 shadow-sm" />
             ) : (
-              <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center text-white shrink-0">
+              <div className="w-10 h-10 bg-gradient-to-br from-brand-400 to-brand-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-md shadow-brand-500/25">
                 <Sparkles className="w-5 h-5" />
               </div>
             )}
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900 truncate">Наши мастера</h1>
+            <h1 className="text-lg sm:text-xl font-extrabold text-gradient truncate">Наши мастера</h1>
           </div>
-          <Link to="/" className="bg-brand-500 hover:bg-brand-600 text-white text-sm px-4 py-2 rounded-lg transition-colors">
+          <Link to="/" className="bg-gradient-to-b from-brand-400 to-brand-600 hover:from-brand-500 hover:to-brand-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md shadow-brand-500/25 transition-all active:scale-[0.97]">
             Записаться
           </Link>
         </div>
@@ -51,7 +51,7 @@ export default function MastersGalleryPage() {
               const profile = m.masterProfile
               const categories = [...new Set(profile?.masterServices.map(ms => ms.service.category) ?? [])]
               return (
-                <section key={m.id} style={{ animationDelay: `${i * 60}ms` }} className="bg-white rounded-2xl border border-gray-200 p-6 animate-fade-in-up opacity-0 [animation-fill-mode:forwards]">
+                <section key={m.id} style={{ animationDelay: `${i * 60}ms` }} className="surface p-6 animate-fade-in-up opacity-0 [animation-fill-mode:forwards]">
                   <div className="flex items-center gap-4 mb-4">
                     <Avatar name={m.name} url={profile?.avatarUrl} size={64} />
                     <div>

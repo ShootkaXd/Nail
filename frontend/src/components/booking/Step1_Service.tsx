@@ -36,10 +36,10 @@ export default function Step1Service({ selected, onSelect }: Props) {
                 key={s.id}
                 onClick={() => onSelect(s)}
                 style={{ animationDelay: `${i * 40}ms` }}
-                className={`text-left p-4 rounded-xl border-2 transition-all animate-fade-in-up opacity-0 [animation-fill-mode:forwards] ${
+                className={`text-left p-4 rounded-2xl border-2 transition-all animate-fade-in-up opacity-0 [animation-fill-mode:forwards] ${
                   selected?.id === s.id
-                    ? 'border-brand-500 bg-brand-50'
-                    : 'border-gray-200 bg-white hover:border-brand-300 hover:shadow-sm hover:-translate-y-0.5'
+                    ? 'border-brand-500 bg-brand-50 shadow-sm'
+                    : 'border-gray-100 bg-gray-50/60 hover:border-brand-300 hover:bg-white hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">

@@ -75,7 +75,7 @@ export default function Step3DateTime({ service, master, selectedSlot, selectedD
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Calendar */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-4">
+        <div className="surface p-4">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => setCurrentMonth(m => {
