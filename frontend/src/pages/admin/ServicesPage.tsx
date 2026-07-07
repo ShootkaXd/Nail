@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { servicesApi } from '../../api/admin'
+import { confirmDialog } from '../../store/confirm.store'
 import type { Service } from '../../types'
 import Button from '../../components/ui/Button'
 import Modal from '../../components/ui/Modal'
@@ -56,7 +57,7 @@ export default function ServicesPage() {
   useEffect(() => { load() }, [])
 
   const del = async (id: number) => {
-    if (!confirm('Удалить услугу?')) return
+    if (!await confirmDialog('Удалить услугу?')) return
     await servicesApi.delete(id)
     load()
   }

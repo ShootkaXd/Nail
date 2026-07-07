@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Check, Plus } from 'lucide-react'
 import { adminsApi, accountApi, authApi } from '../../api/admin'
 import { useAuthStore } from '../../store/auth.store'
+import { confirmDialog } from '../../store/confirm.store'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
 import Modal from '../../components/ui/Modal'
@@ -48,7 +49,7 @@ export default function AdminsPage() {
   }
 
   const del = async (id: number) => {
-    if (!confirm('Удалить администратора?')) return
+    if (!await confirmDialog('Удалить администратора?')) return
     try { await adminsApi.delete(id); load() }
     catch (e: unknown) { alert((e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Ошибка') }
   }

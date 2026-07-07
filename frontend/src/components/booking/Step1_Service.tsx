@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { publicApi } from '../../api/public'
 import type { Service } from '../../types'
-import Spinner from '../ui/Spinner'
+import CardSkeleton from '../ui/CardSkeleton'
 
 interface Props {
   selected: Service | null
@@ -16,7 +16,13 @@ export default function Step1Service({ selected, onSelect }: Props) {
     publicApi.getServices().then(setServices).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <Spinner />
+  if (loading) return (
+    <div>
+      <h2 className="text-2xl font-bold text-gray-900 mb-1">Выберите услугу</h2>
+      <p className="text-gray-500 mb-6">Нажмите на услугу, чтобы продолжить</p>
+      <CardSkeleton count={6} />
+    </div>
+  )
 
   const grouped = services.reduce<Record<string, Service[]>>((acc, s) => {
     ;(acc[s.category] ??= []).push(s)

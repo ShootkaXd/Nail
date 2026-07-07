@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/auth.store'
 import { useThemeLoader } from './hooks/useTheme'
+import ConfirmDialogHost from './components/ui/ConfirmDialogHost'
 import BookingPage from './pages/BookingPage'
 import LoginPage from './pages/LoginPage'
 import SetupPage from './pages/SetupPage'
@@ -32,6 +33,7 @@ export default function App() {
   useThemeLoader()
   return (
     <BrowserRouter>
+      <ConfirmDialogHost />
       <Routes>
         <Route path="/" element={<BookingPage />} />
         <Route path="/masters" element={<MastersGalleryPage />} />

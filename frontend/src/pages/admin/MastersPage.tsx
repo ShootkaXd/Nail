@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MapPin, Plus } from 'lucide-react'
 import { mastersApi, servicesApi } from '../../api/admin'
+import { confirmDialog } from '../../store/confirm.store'
 import type { Master, Service, WorkingHour } from '../../types'
 import Button from '../../components/ui/Button'
 import Modal from '../../components/ui/Modal'
@@ -134,7 +135,7 @@ export default function MastersPage() {
   useEffect(() => { load(); servicesApi.list().then(setServices) }, [])
 
   const del = async (id: number) => {
-    if (!confirm('Удалить мастера?')) return
+    if (!await confirmDialog('Удалить мастера?')) return
     await mastersApi.delete(id)
     load()
   }

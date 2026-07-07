@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Camera, Check, X } from 'lucide-react'
 import { masterApi, authApi } from '../../api/admin'
+import { confirmDialog } from '../../store/confirm.store'
 import type { MasterPhoto } from '../../types'
 import Button from '../../components/ui/Button'
 import Input from '../../components/ui/Input'
@@ -39,7 +40,7 @@ export default function PortfolioPage() {
   }
 
   const del = async (id: number) => {
-    if (!confirm('Удалить фото?')) return
+    if (!await confirmDialog('Удалить фото?')) return
     await masterApi.deletePhoto(id)
     load()
   }

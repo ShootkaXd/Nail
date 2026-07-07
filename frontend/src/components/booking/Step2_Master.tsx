@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, MapPin } from 'lucide-react'
 import { publicApi } from '../../api/public'
 import type { Master, Service } from '../../types'
-import Spinner from '../ui/Spinner'
+import CardSkeleton from '../ui/CardSkeleton'
 import Button from '../ui/Button'
 import Avatar from '../ui/Avatar'
 
@@ -21,8 +21,6 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
     publicApi.getMasters(service.id).then(setMasters).finally(() => setLoading(false))
   }, [service.id])
 
-  if (loading) return <Spinner />
-
   return (
     <div>
       <button onClick={onBack} className="text-sm text-gray-500 hover:text-gray-700 mb-4 flex items-center gap-1">
@@ -31,7 +29,7 @@ export default function Step2Master({ service, selected, onSelect, onBack }: Pro
       <h2 className="text-2xl font-bold text-gray-900 mb-1">Выберите мастера</h2>
       <p className="text-gray-500 mb-6">Услуга: <span className="font-medium text-gray-700">{service.name}</span></p>
 
-      {masters.length === 0 ? (
+      {loading ? <CardSkeleton count={4} /> : masters.length === 0 ? (
         <p className="text-center py-12 text-gray-400">Нет доступных мастеров для этой услуги</p>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">

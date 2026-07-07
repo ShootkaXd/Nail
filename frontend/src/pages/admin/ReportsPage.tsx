@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { reportsApi, type EarningsReport } from '../../api/admin'
-import Spinner from '../../components/ui/Spinner'
 
 const money = (n: number) => n.toLocaleString('ru-RU') + ' ₽'
 
@@ -60,7 +59,17 @@ export default function ReportsPage() {
         <button onClick={() => setFilters({ from: '', to: '', statuses: 'completed,confirmed' })} className="text-sm text-gray-500 hover:text-gray-700 px-3 py-2">Сбросить</button>
       </div>
 
-      {loading ? <Spinner /> : report && (
+      {loading ? (
+        <div>
+          <div className="grid sm:grid-cols-2 gap-4 mb-8">
+            <div className="skeleton h-24 rounded-2xl" />
+            <div className="skeleton h-24 rounded-2xl" />
+          </div>
+          <div className="grid lg:grid-cols-2 gap-6">
+            {Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton h-48 rounded-2xl" />)}
+          </div>
+        </div>
+      ) : report && (
         <>
           {/* Summary cards */}
           <div className="grid sm:grid-cols-2 gap-4 mb-8">

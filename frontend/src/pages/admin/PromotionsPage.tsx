@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { promotionsApi, servicesApi } from '../../api/admin'
+import { confirmDialog } from '../../store/confirm.store'
 import type { Promotion, Service } from '../../types'
 import Button from '../../components/ui/Button'
 import Modal from '../../components/ui/Modal'
@@ -68,7 +69,7 @@ export default function PromotionsPage() {
   useEffect(() => { load(); servicesApi.list().then(setServices) }, [])
 
   const del = async (id: number) => {
-    if (!confirm('Удалить акцию?')) return
+    if (!await confirmDialog('Удалить акцию?')) return
     await promotionsApi.delete(id)
     load()
   }

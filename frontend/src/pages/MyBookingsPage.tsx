@@ -9,6 +9,7 @@ import PublicFooter from '../components/PublicFooter'
 import PhoneInput from '../components/ui/PhoneInput'
 import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
+import { confirmDialog } from '../store/confirm.store'
 import type { Appointment } from '../types'
 
 export default function MyBookingsPage() {
@@ -41,7 +42,7 @@ export default function MyBookingsPage() {
   }
 
   const cancel = async (id: number) => {
-    if (!confirm('Отменить эту запись?')) return
+    if (!await confirmDialog('Отменить эту запись?')) return
     setCancellingId(id)
     try {
       const updated = await publicApi.cancelMyAppointment(id, searchedPhone)

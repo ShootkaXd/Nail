@@ -8,7 +8,6 @@ import SeasonalEffects from '../components/SeasonalEffects'
 import PublicFooter from '../components/PublicFooter'
 import Avatar from '../components/ui/Avatar'
 import type { GalleryMaster, MasterPhoto } from '../types'
-import Spinner from '../components/ui/Spinner'
 
 export default function MastersGalleryPage() {
   const [masters, setMasters] = useState<GalleryMaster[]>([])
@@ -43,7 +42,26 @@ export default function MastersGalleryPage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8">
-        {loading ? <Spinner /> : masters.length === 0 ? (
+        {loading ? (
+          <div className="space-y-10">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="surface p-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="skeleton w-16 h-16 rounded-full shrink-0" />
+                  <div className="space-y-2 flex-1">
+                    <div className="skeleton h-4 w-40 rounded" />
+                    <div className="skeleton h-3 w-64 rounded" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {Array.from({ length: 4 }).map((_, j) => (
+                    <div key={j} className="skeleton aspect-square rounded-xl" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : masters.length === 0 ? (
           <p className="text-center text-gray-400 py-16">Мастера пока не добавлены</p>
         ) : (
           <div className="space-y-10">
