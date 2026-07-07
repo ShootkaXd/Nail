@@ -21,7 +21,7 @@ export default function BookingsPage() {
     if (filters.status) params.status = filters.status
     if (filters.masterId) params.masterId = Number(filters.masterId)
     if (filters.from) params.from = filters.from
-    if (filters.to) params.to = filters.to + 'T23:59:59'
+    if (filters.to) params.to = filters.to
     await appointmentsApi.list(params as Parameters<typeof appointmentsApi.list>[0]).then(setAppointments)
     setLoading(false)
   }

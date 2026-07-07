@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import prisma from '../lib/prisma'
 import { calculatePrice } from '../services/price.service'
 import { normalizePhoneDigits } from '../lib/phone'
+import { parseSalonDateStart, parseSalonDateEnd } from '../lib/salonTime'
 
 const include = {
   master: { select: { id: true, name: true } },
@@ -76,8 +77,8 @@ export async function listAll(req: Request, res: Response) {
   if (masterId) where.masterId = Number(masterId)
   if (from || to) {
     where.startAt = {}
-    if (from) (where.startAt as Record<string, unknown>).gte = new Date(String(from))
-    if (to) (where.startAt as Record<string, unknown>).lte = new Date(String(to))
+    if (from) (where.startAt as Record<string, unknown>).gte = parseSalonDateStart(String(from))
+    if (to) (where.startAt as Record<string, unknown>).lte = parseSalonDateEnd(String(to))
   }
   const appointments = await prisma.appointment.findMany({
     where,
@@ -93,8 +94,8 @@ export async function listMine(req: Request, res: Response) {
   const where: Record<string, unknown> = { masterId }
   if (from || to) {
     where.startAt = {}
-    if (from) (where.startAt as Record<string, unknown>).gte = new Date(String(from))
-    if (to) (where.startAt as Record<string, unknown>).lte = new Date(String(to))
+    if (from) (where.startAt as Record<string, unknown>).gte = parseSalonDateStart(String(from))
+    if (to) (where.startAt as Record<string, unknown>).lte = parseSalonDateEnd(String(to))
   }
   const appointments = await prisma.appointment.findMany({ where, include, orderBy: { startAt: 'asc' } })
   res.json(appointments)

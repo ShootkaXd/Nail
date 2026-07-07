@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import prisma from '../lib/prisma'
+import { parseSalonDateStart, parseSalonDateEnd } from '../lib/salonTime'
 
 // Earnings report aggregated by service and by master.
 // By default counts completed + confirmed appointments (excludes cancelled/pending).
@@ -13,8 +14,8 @@ export async function earnings(req: Request, res: Response) {
   const where: Record<string, unknown> = { status: { in: statusList } }
   if (from || to) {
     const range: Record<string, Date> = {}
-    if (from) range.gte = new Date(String(from))
-    if (to) range.lte = new Date(String(to) + 'T23:59:59')
+    if (from) range.gte = parseSalonDateStart(String(from))
+    if (to) range.lte = parseSalonDateEnd(String(to))
     where.startAt = range
   }
 

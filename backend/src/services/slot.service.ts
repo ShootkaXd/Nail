@@ -1,18 +1,5 @@
 import prisma from '../lib/prisma'
-
-// The salon operates on Russian local time. Working hours entered by
-// admins/masters ("09:00"–"18:00") are wall-clock times in this timezone,
-// not the server process's timezone (which is UTC in Docker by default).
-// Russia has used a single permanent offset (no DST) since 2014, so a fixed
-// offset is safe and avoids depending on the container having IANA tzdata
-// installed / TZ env configured correctly.
-const SALON_UTC_OFFSET_HOURS = 3 // Europe/Moscow (MSK, UTC+3, no DST)
-
-// Builds the UTC instant corresponding to a given wall-clock date/time in
-// the salon's local timezone — independent of the server's own TZ setting.
-function salonLocalToUtc(year: number, month: number, day: number, hours = 0, minutes = 0): Date {
-  return new Date(Date.UTC(year, month - 1, day, hours - SALON_UTC_OFFSET_HOURS, minutes))
-}
+import { salonLocalToUtc, parseSalonDateStart, parseSalonDateEnd } from '../lib/salonTime'
 
 function parseTime(timeStr: string, year: number, month: number, day: number): Date {
   const [hours, minutes] = timeStr.split(':').map(Number)
@@ -47,8 +34,8 @@ export async function getAvailableSlots(
   const workStart = parseTime(workingHour.startTime, year, month, day)
   const workEnd = parseTime(workingHour.endTime, year, month, day)
 
-  const dayStart = salonLocalToUtc(year, month, day, 0, 0)
-  const dayEnd = new Date(salonLocalToUtc(year, month, day + 1, 0, 0).getTime() - 1)
+  const dayStart = parseSalonDateStart(dateStr)
+  const dayEnd = parseSalonDateEnd(dateStr)
 
   const existingAppointments = await prisma.appointment.findMany({
     where: {

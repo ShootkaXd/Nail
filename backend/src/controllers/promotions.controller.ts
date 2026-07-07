@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import prisma from '../lib/prisma'
+import { parseSalonDateStart, parseSalonDateEnd } from '../lib/salonTime'
 
 export async function listPromotions(req: Request, res: Response) {
   const promotions = await prisma.promotion.findMany({
@@ -16,8 +17,8 @@ export async function createPromotion(req: Request, res: Response) {
       name,
       serviceId: serviceId ? Number(serviceId) : null,
       discountPercent: Number(discountPercent),
-      startDate: new Date(startDate),
-      endDate: new Date(endDate),
+      startDate: parseSalonDateStart(startDate),
+      endDate: parseSalonDateEnd(endDate),
       isActive: isActive ?? true,
     },
   })
@@ -33,8 +34,8 @@ export async function updatePromotion(req: Request, res: Response) {
       name,
       serviceId: serviceId !== undefined ? (serviceId ? Number(serviceId) : null) : undefined,
       discountPercent: discountPercent !== undefined ? Number(discountPercent) : undefined,
-      startDate: startDate ? new Date(startDate) : undefined,
-      endDate: endDate ? new Date(endDate) : undefined,
+      startDate: startDate ? parseSalonDateStart(startDate) : undefined,
+      endDate: endDate ? parseSalonDateEnd(endDate) : undefined,
       isActive,
     },
   })
