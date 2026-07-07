@@ -1,10 +1,22 @@
 import prisma from '../lib/prisma'
 
-function parseTime(timeStr: string, date: Date): Date {
+// The salon operates on Russian local time. Working hours entered by
+// admins/masters ("09:00"–"18:00") are wall-clock times in this timezone,
+// not the server process's timezone (which is UTC in Docker by default).
+// Russia has used a single permanent offset (no DST) since 2014, so a fixed
+// offset is safe and avoids depending on the container having IANA tzdata
+// installed / TZ env configured correctly.
+const SALON_UTC_OFFSET_HOURS = 3 // Europe/Moscow (MSK, UTC+3, no DST)
+
+// Builds the UTC instant corresponding to a given wall-clock date/time in
+// the salon's local timezone — independent of the server's own TZ setting.
+function salonLocalToUtc(year: number, month: number, day: number, hours = 0, minutes = 0): Date {
+  return new Date(Date.UTC(year, month - 1, day, hours - SALON_UTC_OFFSET_HOURS, minutes))
+}
+
+function parseTime(timeStr: string, year: number, month: number, day: number): Date {
   const [hours, minutes] = timeStr.split(':').map(Number)
-  const d = new Date(date)
-  d.setHours(hours, minutes, 0, 0)
-  return d
+  return salonLocalToUtc(year, month, day, hours, minutes)
 }
 
 export async function getAvailableSlots(
@@ -12,10 +24,11 @@ export async function getAvailableSlots(
   serviceId: number,
   dateStr: string
 ): Promise<string[]> {
-  // Parse as local midnight to avoid timezone shift on dayOfWeek
   const [year, month, day] = dateStr.split('-').map(Number)
-  const date = new Date(year, month - 1, day)
-  const dayOfWeek = date.getDay()
+  // dayOfWeek must reflect the salon's local calendar date, not UTC's —
+  // construct it from the same local wall-clock reference point (local noon
+  // avoids any chance of crossing a UTC day boundary near midnight).
+  const dayOfWeek = new Date(year, month - 1, day, 12).getDay()
 
   const workingHour = await prisma.workingHour.findFirst({
     where: { masterId, dayOfWeek, isActive: true },
@@ -28,11 +41,11 @@ export async function getAvailableSlots(
   const durationMs = service.durationMinutes * 60 * 1000
   const stepMs = 30 * 60 * 1000
 
-  const workStart = parseTime(workingHour.startTime, date)
-  const workEnd = parseTime(workingHour.endTime, date)
+  const workStart = parseTime(workingHour.startTime, year, month, day)
+  const workEnd = parseTime(workingHour.endTime, year, month, day)
 
-  const dayStart = new Date(year, month - 1, day, 0, 0, 0, 0)
-  const dayEnd = new Date(year, month - 1, day, 23, 59, 59, 999)
+  const dayStart = salonLocalToUtc(year, month, day, 0, 0)
+  const dayEnd = new Date(salonLocalToUtc(year, month, day + 1, 0, 0).getTime() - 1)
 
   const existingAppointments = await prisma.appointment.findMany({
     where: {

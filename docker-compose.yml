@@ -10,6 +10,9 @@ services:
       CORS_ORIGIN: "${CORS_ORIGIN:-*}"
       NODE_ENV: "production"
       UPLOAD_DIR: "/app/data/uploads"
+      # Cosmetic only (log timestamps) — slot/working-hours math is timezone-independent,
+      # it computes the Europe/Moscow offset explicitly (see backend/src/services/slot.service.ts).
+      TZ: "Europe/Moscow"
     volumes:
       - db-data:/app/data
     expose:

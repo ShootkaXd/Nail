@@ -18,15 +18,18 @@ function WorkingHoursEditor({ masterId, onClose }: { masterId: number; onClose: 
   const [hours, setHours] = useState<WorkingHour[]>(defaultHours)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    mastersApi.getWorkingHours(masterId).then(data => {
-      if (data.length > 0) {
-        const mapped = defaultHours.map(dh => data.find(d => d.dayOfWeek === dh.dayOfWeek) ?? dh)
-        setHours(mapped)
-      }
-      setLoading(false)
-    })
+    mastersApi.getWorkingHours(masterId)
+      .then(data => {
+        if (data.length > 0) {
+          const mapped = defaultHours.map(dh => data.find(d => d.dayOfWeek === dh.dayOfWeek) ?? dh)
+          setHours(mapped)
+        }
+      })
+      .catch(() => setError('Не удалось загрузить график. Показаны значения по умолчанию — проверьте перед сохранением.'))
+      .finally(() => setLoading(false))
   }, [masterId])
 
   const update = (i: number, patch: Partial<WorkingHour>) =>
@@ -34,9 +37,15 @@ function WorkingHoursEditor({ masterId, onClose }: { masterId: number; onClose: 
 
   const save = async () => {
     setSaving(true)
-    await mastersApi.saveWorkingHours(masterId, hours)
-    setSaving(false)
-    onClose()
+    setError('')
+    try {
+      await mastersApi.saveWorkingHours(masterId, hours)
+      onClose()
+    } catch {
+      setError('Не удалось сохранить график. Попробуйте ещё раз.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (loading) return <div className="py-8 text-center text-gray-400">Загрузка...</div>
@@ -60,6 +69,7 @@ function WorkingHoursEditor({ masterId, onClose }: { masterId: number; onClose: 
           )}
         </div>
       ))}
+      {error && <p className="text-sm text-red-500 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
       <div className="flex gap-3 pt-2">
         <Button variant="secondary" onClick={onClose}>Отмена</Button>
         <Button onClick={save} loading={saving}>Сохранить</Button>
